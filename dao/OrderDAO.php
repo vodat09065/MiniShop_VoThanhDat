@@ -9,12 +9,26 @@ class OrderDAO extends BaseDAO
         parent::__construct();
     }
 
-    public function getAll(): array
+    public function getAll(string $keyword = ""): array
     {
         $list = [];
         try {
-            $sql = "SELECT * FROM orders ORDER BY id DESC";
-            $result = $this->executeQuery($sql);
+            $sql = "SELECT o.*, c.fullname AS customerName, u.fullname AS userName 
+                    FROM orders o
+                    INNER JOIN customers c ON o.customer_id = c.id
+                    LEFT JOIN users u ON o.user_id = u.id";
+            if (!empty($keyword)) {
+                $sql .= " WHERE o.order_code LIKE ? OR c.fullname LIKE ?";
+            }
+            $sql .= " ORDER BY o.id DESC";
+            
+            $stmt = $this->prepare($sql);
+            if (!empty($keyword)) {
+                $search = "%{$keyword}%";
+                $stmt->bind_param("ss", $search, $search);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
                 $order = new Order(
                     $row["customer_id"],
@@ -27,6 +41,8 @@ class OrderDAO extends BaseDAO
                 $order->id = $row["id"];
                 $order->createdAt = $row["created_at"];
                 $order->updatedAt = $row["updated_at"];
+                $order->customerName = $row["customerName"];
+                $order->userName = $row["userName"] ?? "N/A";
                 $list[] = $order;
             }
         } catch (Exception $e) {
@@ -35,10 +51,48 @@ class OrderDAO extends BaseDAO
         return $list;
     }
 
+    public function getLatest(int $limit): array { 
+        $list = []; 
+        try { 
+            $sql = "SELECT o.*, c.fullname AS customerName, u.fullname AS userName 
+                    FROM orders o
+                    INNER JOIN customers c ON o.customer_id = c.id
+                    LEFT JOIN users u ON o.user_id = u.id 
+                    ORDER BY o.id DESC LIMIT ?"; 
+            $stmt = $this->prepare($sql); 
+            $stmt->bind_param("i", $limit); 
+            $stmt->execute(); 
+            $result = $stmt->get_result(); 
+            while ($row = $result->fetch_assoc()) { 
+                $order = new Order(
+                    $row["customer_id"], 
+                    $row["user_id"], 
+                    $row["order_code"], 
+                    $row["total_amount"], 
+                    $row["note"], 
+                    $row["status"]
+                ); 
+                $order->id = $row["id"]; 
+                $order->createdAt = $row["created_at"]; 
+                $order->updatedAt = $row["updated_at"]; 
+                $order->customerName = $row["customerName"];
+                $order->userName = $row["userName"] ?? "N/A";
+                $list[] = $order; 
+            } 
+        } catch (Exception $e) { 
+            throw $e; 
+        } 
+        return $list; 
+    }
+
     public function findById(int $id): ?Order
     {
         try {
-            $sql = "SELECT * FROM orders WHERE id=?";
+            $sql = "SELECT o.*, c.fullname AS customerName, u.fullname AS userName 
+                    FROM orders o
+                    INNER JOIN customers c ON o.customer_id = c.id
+                    LEFT JOIN users u ON o.user_id = u.id 
+                    WHERE o.id=?";
             $stmt = $this->prepare($sql);
             $stmt->bind_param("i", $id);
             $stmt->execute();
@@ -55,6 +109,8 @@ class OrderDAO extends BaseDAO
                 $order->id = $row["id"];
                 $order->createdAt = $row["created_at"];
                 $order->updatedAt = $row["updated_at"];
+                $order->customerName = $row["customerName"];
+                $order->userName = $row["userName"] ?? "N/A";
                 return $order;
             }
         } catch (Exception $e) {
@@ -63,61 +119,15 @@ class OrderDAO extends BaseDAO
         return null;
     }
 
-    public function insert(Order $order): bool
+    public function updateStatus(int $id, int $status): bool
     {
         try {
-            $sql = "INSERT INTO orders(customer_id, user_id, order_code, total_amount, note, status)
-                    VALUES(?,?,?,?,?,?)";
+            $sql = "UPDATE orders SET status=? WHERE id=?";
             $stmt = $this->prepare($sql);
-            $stmt->bind_param(
-                "iisdsi",
-                $order->customerId,
-                $order->userId,
-                $order->orderCode,
-                $order->totalAmount,
-                $order->note,
-                $order->status
-            );
+            $stmt->bind_param("ii", $status, $id);
             return $stmt->execute();
         } catch (Exception $e) {
             throw $e;
         }
     }
-
-    public function update(Order $order): bool
-    {
-        try {
-            $sql = "UPDATE orders
-                    SET customer_id=?, user_id=?, order_code=?, total_amount=?, note=?, status=?
-                    WHERE id=?";
-            $stmt = $this->prepare($sql);
-            $stmt->bind_param(
-                "iisdsii",
-                $order->customerId,
-                $order->userId,
-                $order->orderCode,
-                $order->totalAmount,
-                $order->note,
-                $order->status,
-                $order->id
-            );
-            return $stmt->execute();
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-
-    public function delete(int $id): bool
-    {
-        try {
-            $sql = "DELETE FROM orders WHERE id=?";
-            $stmt = $this->prepare($sql);
-            $stmt->bind_param("i", $id);
-            return $stmt->execute();
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-
-    public function getLatest(int $limit): array { $list = []; try { $sql = "SELECT * FROM orders ORDER BY id DESC LIMIT ?"; $stmt = $this->prepare($sql); $stmt->bind_param("i", $limit); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $order = new Order($row["customer_id"], $row["user_id"], $row["order_code"], $row["total_amount"], $row["note"], $row["status"]); $order->id = $row["id"]; $order->createdAt = $row["created_at"]; $order->updatedAt = $row["updated_at"]; $list[] = $order; } } catch (Exception $e) { throw $e; } return $list; } 
 }

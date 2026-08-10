@@ -9,12 +9,26 @@ class ProductDAO extends BaseDAO
         parent::__construct();
     }
 
-    public function getAll(): array
+    public function getAll(string $keyword = ""): array
     {
         $list = [];
         try {
-            $sql = "SELECT * FROM products ORDER BY id DESC";
-            $result = $this->executeQuery($sql);
+            $sql = "SELECT p.*, c.catename AS cateName, b.brandname AS brandName 
+                    FROM products p
+                    INNER JOIN categories c ON p.category_id = c.id
+                    INNER JOIN brands b ON p.brand_id = b.id";
+            if (!empty($keyword)) {
+                $sql .= " WHERE p.proname LIKE ? OR c.catename LIKE ? OR b.brandname LIKE ?";
+            }
+            $sql .= " ORDER BY p.id DESC";
+            
+            $stmt = $this->prepare($sql);
+            if (!empty($keyword)) {
+                $search = "%{$keyword}%";
+                $stmt->bind_param("sss", $search, $search, $search);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
                 $product = new Product(
                     $row["category_id"],
@@ -31,6 +45,8 @@ class ProductDAO extends BaseDAO
                 $product->id = $row["id"];
                 $product->createdAt = $row["created_at"];
                 $product->updatedAt = $row["updated_at"];
+                $product->cateName = $row["cateName"];
+                $product->brandName = $row["brandName"];
                 $list[] = $product;
             }
         } catch (Exception $e) {
@@ -39,10 +55,52 @@ class ProductDAO extends BaseDAO
         return $list;
     }
 
+    public function getLatest(int $limit): array { 
+        $list = []; 
+        try { 
+            $sql = "SELECT p.*, c.catename AS cateName, b.brandname AS brandName 
+                    FROM products p
+                    INNER JOIN categories c ON p.category_id = c.id
+                    INNER JOIN brands b ON p.brand_id = b.id 
+                    ORDER BY p.id DESC LIMIT ?"; 
+            $stmt = $this->prepare($sql); 
+            $stmt->bind_param("i", $limit); 
+            $stmt->execute(); 
+            $result = $stmt->get_result(); 
+            while ($row = $result->fetch_assoc()) { 
+                $product = new Product(
+                    $row["category_id"], 
+                    $row["brand_id"], 
+                    $row["proname"], 
+                    $row["slug"], 
+                    $row["price"], 
+                    $row["discount_price"], 
+                    $row["quantity"], 
+                    $row["image"], 
+                    $row["description"], 
+                    $row["status"]
+                ); 
+                $product->id = $row["id"]; 
+                $product->createdAt = $row["created_at"]; 
+                $product->updatedAt = $row["updated_at"]; 
+                $product->cateName = $row["cateName"];
+                $product->brandName = $row["brandName"];
+                $list[] = $product; 
+            } 
+        } catch (Exception $e) { 
+            throw $e; 
+        } 
+        return $list; 
+    }
+
     public function findById(int $id): ?Product
     {
         try {
-            $sql = "SELECT * FROM products WHERE id=?";
+            $sql = "SELECT p.*, c.catename AS cateName, b.brandname AS brandName 
+                    FROM products p
+                    INNER JOIN categories c ON p.category_id = c.id
+                    INNER JOIN brands b ON p.brand_id = b.id 
+                    WHERE p.id=?";
             $stmt = $this->prepare($sql);
             $stmt->bind_param("i", $id);
             $stmt->execute();
@@ -63,6 +121,8 @@ class ProductDAO extends BaseDAO
                 $product->id = $row["id"];
                 $product->createdAt = $row["created_at"];
                 $product->updatedAt = $row["updated_at"];
+                $product->cateName = $row["cateName"];
+                $product->brandName = $row["brandName"];
                 return $product;
             }
         } catch (Exception $e) {
@@ -134,6 +194,4 @@ class ProductDAO extends BaseDAO
             throw $e;
         }
     }
-
-    public function getLatest(int $limit): array { $list = []; try { $sql = "SELECT * FROM products ORDER BY id DESC LIMIT ?"; $stmt = $this->prepare($sql); $stmt->bind_param("i", $limit); $stmt->execute(); $result = $stmt->get_result(); while ($row = $result->fetch_assoc()) { $product = new Product($row["category_id"], $row["brand_id"], $row["proname"], $row["slug"], $row["price"], $row["discount_price"], $row["quantity"], $row["image"], $row["description"], $row["status"]); $product->id = $row["id"]; $product->createdAt = $row["created_at"]; $product->updatedAt = $row["updated_at"]; $list[] = $product; } } catch (Exception $e) { throw $e; } return $list; } 
 }

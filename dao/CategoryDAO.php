@@ -9,13 +9,24 @@ class CategoryDAO extends BaseDAO
         parent::__construct();
     }
 
-    // Lấy tất cả danh mục
-    public function getAll(): array
+    // Lấy tất cả danh mục (có hỗ trợ tìm kiếm)
+    public function getAll(string $keyword = ""): array
     {
         $list = [];
         try {
-            $sql = "SELECT * FROM categories ORDER BY catename";
-            $result = $this->executeQuery($sql);
+            $sql = "SELECT * FROM categories";
+            if (!empty($keyword)) {
+                $sql .= " WHERE catename LIKE ? OR slug LIKE ?";
+            }
+            $sql .= " ORDER BY catename";
+            
+            $stmt = $this->prepare($sql);
+            if (!empty($keyword)) {
+                $search = "%{$keyword}%";
+                $stmt->bind_param("ss", $search, $search);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
                 $category = new Category(
                     $row["catename"],

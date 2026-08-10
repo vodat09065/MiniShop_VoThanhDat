@@ -9,12 +9,23 @@ class CustomerDAO extends BaseDAO
         parent::__construct();
     }
 
-    public function getAll(): array
+    public function getAll(string $keyword = ""): array
     {
         $list = [];
         try {
-            $sql = "SELECT * FROM customers ORDER BY id DESC";
-            $result = $this->executeQuery($sql);
+            $sql = "SELECT * FROM customers";
+            if (!empty($keyword)) {
+                $sql .= " WHERE fullname LIKE ? OR phone LIKE ?";
+            }
+            $sql .= " ORDER BY id DESC";
+            
+            $stmt = $this->prepare($sql);
+            if (!empty($keyword)) {
+                $search = "%{$keyword}%";
+                $stmt->bind_param("ss", $search, $search);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
                 $customer = new Customer(
                     $row["fullname"],

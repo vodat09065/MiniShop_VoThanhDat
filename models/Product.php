@@ -15,6 +15,10 @@ class Product
     public string $createdAt;
     public string $updatedAt;
 
+    // Thuộc tính lấy từ bảng JOIN
+    public string $cateName = "";
+    public string $brandName = "";
+
     public function __construct(
         int $categoryId = 0,
         int $brandId = 0,

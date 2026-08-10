@@ -9,12 +9,23 @@ class BrandDAO extends BaseDAO
         parent::__construct();
     }
 
-    public function getAll(): array
+    public function getAll(string $keyword = ""): array
     {
         $list = [];
         try {
-            $sql = "SELECT * FROM brands ORDER BY brandname";
-            $result = $this->executeQuery($sql);
+            $sql = "SELECT * FROM brands";
+            if (!empty($keyword)) {
+                $sql .= " WHERE brandname LIKE ? OR slug LIKE ?";
+            }
+            $sql .= " ORDER BY brandname";
+            
+            $stmt = $this->prepare($sql);
+            if (!empty($keyword)) {
+                $search = "%{$keyword}%";
+                $stmt->bind_param("ss", $search, $search);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
                 $brand = new Brand(
                     $row["brandname"],
