@@ -1,5 +1,5 @@
 <?php
-require_once "../../dao/ProductDAO.php";
+require_once "../../../dao/ProductDAO.php";
 
 $productDAO = new ProductDAO();
 $keyword = "";

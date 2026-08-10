@@ -1,6 +1,6 @@
 <?php
-require_once "../../dao/OrderDAO.php";
-require_once "../../dao/OrderDetailDAO.php";
+require_once "../../../dao/OrderDAO.php";
+require_once "../../../dao/OrderDetailDAO.php";
 
 $orderDAO = new OrderDAO();
 $orderDetailDAO = new OrderDetailDAO();

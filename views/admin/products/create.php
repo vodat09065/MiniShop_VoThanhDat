@@ -1,7 +1,7 @@
 <?php
-require_once "../../dao/ProductDAO.php";
-require_once "../../dao/CategoryDAO.php";
-require_once "../../dao/BrandDAO.php";
+require_once "../../../dao/ProductDAO.php";
+require_once "../../../dao/CategoryDAO.php";
+require_once "../../../dao/BrandDAO.php";
 
 $productDAO = new ProductDAO();
 $categoryDAO = new CategoryDAO();

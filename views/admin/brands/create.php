@@ -1,5 +1,5 @@
 <?php
-require_once "../../dao/BrandDAO.php";
+require_once "../../../dao/BrandDAO.php";
 
 $brandDAO = new BrandDAO();
 $errors = [];

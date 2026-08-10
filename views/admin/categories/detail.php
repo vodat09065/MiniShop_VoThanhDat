@@ -1,5 +1,5 @@
 <?php
-require_once "../../dao/CategoryDAO.php";
+require_once "../../../dao/CategoryDAO.php";
 
 $categoryDAO = new CategoryDAO();
 $id = $_GET["id"] ?? 0;

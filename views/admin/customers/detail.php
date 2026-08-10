@@ -1,5 +1,5 @@
 <?php
-require_once "../../dao/CustomerDAO.php";
+require_once "../../../dao/CustomerDAO.php";
 
 $customerDAO = new CustomerDAO();
 $id = $_GET["id"] ?? 0;
