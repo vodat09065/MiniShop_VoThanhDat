@@ -19,6 +19,13 @@ $brands = $brandDAO->getAll();
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST["btnDeleteImage"])) {
+        $imgId = (int)$_POST["deleteImageId"];
+        $productDAO->deleteImage($imgId);
+        header("Location: edit.php?id=$id");
+        exit();
+    }
+
     $productName = trim($_POST["productName"] ?? "");
     $slug = trim($_POST["slug"] ?? "");
     $categoryId = $_POST["categoryId"] ?? 0;
@@ -38,6 +45,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($quantity < 0) $errors[] = "Số lượng không hợp lệ.";
 
     if (empty($errors)) {
+        $imageName = $product->image;
+        $fileName = $_FILES["image"]["name"] ?? "";
+        if ($fileName != "") {
+            $tmpName = $_FILES["image"]["tmp_name"] ?? "";
+            $fileSize = $_FILES["image"]["size"] ?? 0;
+            $error = $_FILES["image"]["error"] ?? 0;
+            
+            if ($error != UPLOAD_ERR_OK) {
+                $errors[] = "Upload hình ảnh không thành công.";
+            }
+            
+            $allowExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            if (!in_array($extension, $allowExtensions)) {
+                $errors[] = "Chỉ cho phép file JPG, JPEG, PNG, GIF hoặc WEBP.";
+            }
+            
+            $maxSize = 200 * 1024;
+            if ($fileSize > $maxSize) {
+                $errors[] = "Kích thước hình ảnh <= 200 KB.";
+            }
+            
+            if (empty($errors)) {
+                $imageName = time() . "_" . $slug . "." . $extension;
+                $uploadPath = __DIR__ . "/../../../uploads/products/" . $imageName;
+                if (!empty($product->image)) {
+                    $oldImage = __DIR__ . "/../../../uploads/products/" . $product->image;
+                    if (file_exists($oldImage) && is_file($oldImage)) {
+                        unlink($oldImage);
+                    }
+                }
+                move_uploaded_file($tmpName, $uploadPath);
+            }
+        }
+
+        if (empty($errors)) {
         $product->proname = $productName;
         $product->slug = $slug;
         $product->categoryId = $categoryId;
@@ -45,10 +88,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $product->price = $price;
         $product->discountPrice = $discountPrice;
         $product->quantity = $quantity;
+        $product->image = $imageName;
         $product->description = $description;
         $product->status = $status;
 
         if ($productDAO->update($product)) {
+            // Upload multiple images
+            if (isset($_FILES["images"]["name"]) && is_array($_FILES["images"]["name"])) {
+                $allowExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+                $totalFiles = count($_FILES["images"]["name"]);
+                for ($i = 0; $i < $totalFiles; $i++) {
+                    $fName = $_FILES["images"]["name"][$i];
+                    if ($fName != "") {
+                        $tName = $_FILES["images"]["tmp_name"][$i];
+                        $ext = strtolower(pathinfo($fName, PATHINFO_EXTENSION));
+                        if (in_array($ext, $allowExtensions)) {
+                            $galleryName = time() . "_" . $i . "_" . $slug . "." . $ext;
+                            $gUploadPath = __DIR__ . "/../../../uploads/products/" . $galleryName;
+                            if (move_uploaded_file($tName, $gUploadPath)) {
+                                $productDAO->insertImage($id, $galleryName);
+                            }
+                        }
+                    }
+                }
+            }
+
             header("Location: index.php");
             exit();
         } else {
@@ -119,6 +183,33 @@ ob_start();
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Số lượng</label>
                     <input type="number" name="quantity" class="form-control" value="<?= htmlspecialchars($product->quantity) ?>">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="text-center mb-3" id="preview">
+                        <?php if (!empty($product->image)): ?>
+                            <img src="/MiniShop_VoThanhDat/uploads/products/<?= htmlspecialchars($product->image) ?>" class="img-thumbnail" width="150">
+                        <?php endif; ?>
+                    </div>
+                    <label class="form-label">Hình ảnh mới</label>
+                    <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Hình ảnh phụ (Gallery)</label>
+                    <div class="d-flex flex-wrap mb-2">
+                        <?php 
+                        $gallery = $productDAO->getImagesByProductId($id);
+                        foreach ($gallery as $img): 
+                        ?>
+                            <div class="position-relative me-2 mb-2">
+                                <img src="/MiniShop_VoThanhDat/uploads/products/<?= htmlspecialchars($img->image) ?>" class="img-thumbnail" width="100">
+                                <button type="submit" name="btnDeleteImage" value="1" onclick="document.getElementById('deleteImageId').value=<?= $img->id ?>; return confirm('Bạn có chắc chắn muốn xóa ảnh này?');" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"><i class="fas fa-times"></i></button>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="text-center mb-3" id="preview-gallery"></div>
+                    <label class="form-label">Thêm ảnh phụ mới</label>
+                    <input type="file" id="images" name="images[]" class="form-control" accept="image/*" multiple>
+                    <input type="hidden" name="deleteImageId" id="deleteImageId" value="">
                 </div>
                 <div class="col-md-12 mb-3">
                     <label class="form-label">Mô tả</label>

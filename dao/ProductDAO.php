@@ -131,11 +131,11 @@ class ProductDAO extends BaseDAO
         return null;
     }
 
-    public function insert(Product $product): bool
+    public function insert(Product $product): int
     {
         try {
             $sql = "INSERT INTO products(category_id, brand_id, proname, slug, price, discount_price, quantity, image, description, status)
-                    VALUES(?,?,?,?,?,?,?,?,?,?)";
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->prepare($sql);
             $stmt->bind_param(
                 "iisssddisi",
@@ -150,7 +150,10 @@ class ProductDAO extends BaseDAO
                 $product->description,
                 $product->status
             );
-            return $stmt->execute();
+            if ($stmt->execute()) {
+                return $this->conn->insert_id;
+            }
+            return 0;
         } catch (Exception $e) {
             throw $e;
         }
@@ -187,6 +190,72 @@ class ProductDAO extends BaseDAO
     {
         try {
             $sql = "DELETE FROM products WHERE id=?";
+            $stmt = $this->prepare($sql);
+            $stmt->bind_param("i", $id);
+            return $stmt->execute();
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    // --- CÁC HÀM QUẢN LÝ ẢNH PHỤ (PRODUCT_IMAGES) ---
+    public function insertImage(int $productId, string $image): bool
+    {
+        try {
+            $sql = "INSERT INTO product_images(product_id, image) VALUES(?, ?)";
+            $stmt = $this->prepare($sql);
+            $stmt->bind_param("is", $productId, $image);
+            return $stmt->execute();
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function getImagesByProductId(int $productId): array
+    {
+        $list = [];
+        try {
+            require_once __DIR__ . "/../models/ProductImage.php";
+            $sql = "SELECT * FROM product_images WHERE product_id=? ORDER BY id ASC";
+            $stmt = $this->prepare($sql);
+            $stmt->bind_param("i", $productId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $img = new ProductImage(
+                    $row["product_id"],
+                    $row["image"],
+                    $row["sort_order"] ?? 0
+                );
+                $img->id = $row["id"];
+                $img->createdAt = $row["created_at"];
+                $list[] = $img;
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        return $list;
+    }
+
+    public function deleteImage(int $id): bool
+    {
+        try {
+            // Lấy tên ảnh trước để xóa file
+            $sqlGet = "SELECT image FROM product_images WHERE id=?";
+            $stmtGet = $this->prepare($sqlGet);
+            $stmtGet->bind_param("i", $id);
+            $stmtGet->execute();
+            $res = $stmtGet->get_result();
+            if ($row = $res->fetch_assoc()) {
+                $fileName = $row["image"];
+                $filePath = __DIR__ . "/../uploads/products/" . $fileName;
+                if (file_exists($filePath) && is_file($filePath)) {
+                    unlink($filePath);
+                }
+            }
+
+            // Xóa record
+            $sql = "DELETE FROM product_images WHERE id=?";
             $stmt = $this->prepare($sql);
             $stmt->bind_param("i", $id);
             return $stmt->execute();

@@ -25,6 +25,35 @@ ob_start();
                 <tr><th>Danh mục</th><td><?= htmlspecialchars($product->cateName) ?></td></tr>
                 <tr><th>Thương hiệu</th><td><?= htmlspecialchars($product->brandName) ?></td></tr>
                 <tr><th>Slug</th><td><?= htmlspecialchars($product->slug) ?></td></tr>
+                <tr>
+                    <th>Hình ảnh</th>
+                    <td>
+                        <?php if (!empty($product->image)): ?>
+                            <img src="/MiniShop_VoThanhDat/uploads/products/<?= htmlspecialchars($product->image) ?>" class="img-thumbnail" width="150">
+                        <?php else: ?>
+                            <span class="text-muted">No Image</span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Hình ảnh phụ</th>
+                    <td>
+                        <div class="d-flex flex-wrap">
+                            <?php 
+                            $gallery = $productDAO->getImagesByProductId($product->id);
+                            if (count($gallery) > 0):
+                                foreach ($gallery as $img): 
+                            ?>
+                                <img src="/MiniShop_VoThanhDat/uploads/products/<?= htmlspecialchars($img->image) ?>" class="img-thumbnail me-2 mb-2" width="100">
+                            <?php 
+                                endforeach; 
+                            else:
+                            ?>
+                                <span class="text-muted">Không có ảnh phụ</span>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
                 <tr><th>Giá bán</th><td class="text-danger fw-bold"><?= number_format($product->price, 0, ',', '.') ?> đ</td></tr>
                 <tr><th>Giá khuyến mãi</th><td><?= number_format($product->discountPrice, 0, ',', '.') ?> đ</td></tr>
                 <tr><th>Tồn kho</th><td><?= $product->quantity ?></td></tr>

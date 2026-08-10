@@ -19,12 +19,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($errors)) {
-        $category = new Category($cateName, $slug, null, $description, $status);
-        if ($categoryDAO->insert($category)) {
+        $imageName = "";
+        $fileName = $_FILES["image"]["name"] ?? "";
+        if ($fileName != "") {
+            $tmpName = $_FILES["image"]["tmp_name"] ?? "";
+            $fileSize = $_FILES["image"]["size"] ?? 0;
+            $error = $_FILES["image"]["error"] ?? 0;
+            
+            if ($error != UPLOAD_ERR_OK) {
+                $errors[] = "Upload hình ảnh không thành công.";
+            }
+            
+            $allowExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            if (!in_array($extension, $allowExtensions)) {
+                $errors[] = "Chỉ cho phép file JPG, JPEG, PNG, GIF hoặc WEBP.";
+            }
+            
+            $maxSize = 200 * 1024;
+            if ($fileSize > $maxSize) {
+                $errors[] = "Kích thước hình ảnh <= 200 KB.";
+            }
+            
+            if (empty($errors)) {
+                $imageName = time() . "_" . $slug . "." . $extension;
+                $uploadPath = __DIR__ . "/../../../uploads/categories/" . $imageName;
+                move_uploaded_file($tmpName, $uploadPath);
+            }
+        }
+
+        if (empty($errors)) {
+            $category = new Category($cateName, $slug, $imageName, $description, $status);
+            if ($categoryDAO->insert($category)) {
             header("Location: index.php");
             exit();
-        } else {
-            $errors[] = "Thêm danh mục thất bại. Vui lòng thử lại.";
+            } else {
+                $errors[] = "Thêm danh mục thất bại. Vui lòng thử lại.";
+            }
         }
     }
 }
@@ -48,7 +79,7 @@ ob_start();
             </div>
         <?php endif; ?>
 
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label">Tên danh mục <span class="text-danger">*</span></label>
                 <input type="text" name="cateName" class="form-control" value="<?= isset($_POST['cateName']) ? htmlspecialchars($_POST['cateName']) : '' ?>">
@@ -56,6 +87,11 @@ ob_start();
             <div class="mb-3">
                 <label class="form-label">Slug <span class="text-danger">*</span></label>
                 <input type="text" name="slug" class="form-control" value="<?= isset($_POST['slug']) ? htmlspecialchars($_POST['slug']) : '' ?>">
+            </div>
+            <div class="mb-3">
+                <div class="text-center mb-3" id="preview"></div>
+                <label class="form-label">Hình ảnh</label>
+                <input type="file" id="image" name="image" class="form-control" accept="image/*">
             </div>
             <div class="mb-3">
                 <label class="form-label">Mô tả</label>

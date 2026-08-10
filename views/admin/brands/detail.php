@@ -33,6 +33,16 @@ ob_start();
                     <td><?= htmlspecialchars($brand->slug) ?></td>
                 </tr>
                 <tr>
+                    <th>Hình ảnh</th>
+                    <td>
+                        <?php if (!empty($brand->image)): ?>
+                            <img src="/MiniShop_VoThanhDat/uploads/brands/<?= htmlspecialchars($brand->image) ?>" class="img-thumbnail" width="150">
+                        <?php else: ?>
+                            <span class="text-muted">No Image</span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
                     <th>Mô tả</th>
                     <td><?= nl2br(htmlspecialchars($brand->description)) ?></td>
                 </tr>

@@ -49,6 +49,7 @@ ob_start();
                 <thead class="table-light">
                     <tr>
                         <th>STT</th>
+                        <th>Hình ảnh</th>
                         <th>Tên danh mục</th>
                         <th>Slug</th>
                         <th>Trạng thái</th>
@@ -61,6 +62,13 @@ ob_start();
                         <?php foreach ($categories as $index => $item): ?>
                         <tr>
                             <td><?= $index + 1 ?></td>
+                            <td>
+                                <?php if (!empty($item->image)): ?>
+                                    <img src="/MiniShop_VoThanhDat/uploads/categories/<?= htmlspecialchars($item->image) ?>" class="img-thumbnail" width="60">
+                                <?php else: ?>
+                                    <span class="text-muted">No Image</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= htmlspecialchars($item->catename) ?></td>
                             <td><?= htmlspecialchars($item->slug) ?></td>
                             <td>

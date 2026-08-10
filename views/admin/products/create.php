@@ -31,15 +31,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($quantity < 0) $errors[] = "Số lượng không hợp lệ.";
 
     if (empty($errors)) {
-        // Mock image upload
-        $image = null;
+        $imageName = "";
+        $fileName = $_FILES["image"]["name"] ?? "";
+        if ($fileName != "") {
+            $tmpName = $_FILES["image"]["tmp_name"] ?? "";
+            $fileSize = $_FILES["image"]["size"] ?? 0;
+            $error = $_FILES["image"]["error"] ?? 0;
+            
+            if ($error != UPLOAD_ERR_OK) {
+                $errors[] = "Upload hình ảnh không thành công.";
+            }
+            
+            $allowExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            if (!in_array($extension, $allowExtensions)) {
+                $errors[] = "Chỉ cho phép file JPG, JPEG, PNG, GIF hoặc WEBP.";
+            }
+            
+            $maxSize = 200 * 1024;
+            if ($fileSize > $maxSize) {
+                $errors[] = "Kích thước hình ảnh <= 200 KB.";
+            }
+            
+            if (empty($errors)) {
+                $imageName = time() . "_" . $slug . "." . $extension;
+                $uploadPath = __DIR__ . "/../../../uploads/products/" . $imageName;
+                move_uploaded_file($tmpName, $uploadPath);
+            }
+        }
+        if (empty($errors)) {
+            $product = new Product($categoryId, $brandId, $productName, $slug, $price, $discountPrice, $quantity, $imageName, $description, $status);
+            $newProductId = $productDAO->insert($product);
+            if ($newProductId > 0) {
+                // Xử lý upload nhiều ảnh (Gallery)
+                if (isset($_FILES["images"]["name"]) && is_array($_FILES["images"]["name"])) {
+                    $totalFiles = count($_FILES["images"]["name"]);
+                    for ($i = 0; $i < $totalFiles; $i++) {
+                        $fName = $_FILES["images"]["name"][$i];
+                        if ($fName != "") {
+                            $tName = $_FILES["images"]["tmp_name"][$i];
+                            $ext = strtolower(pathinfo($fName, PATHINFO_EXTENSION));
+                            if (in_array($ext, $allowExtensions)) {
+                                $galleryName = time() . "_" . $i . "_" . $slug . "." . $ext;
+                                $gUploadPath = __DIR__ . "/../../../uploads/products/" . $galleryName;
+                                if (move_uploaded_file($tName, $gUploadPath)) {
+                                    $productDAO->insertImage($newProductId, $galleryName);
+                                }
+                            }
+                        }
+                    }
+                }
 
-        $product = new Product($categoryId, $brandId, $productName, $slug, $price, $discountPrice, $quantity, $image, $description, $status);
-        if ($productDAO->insert($product)) {
-            header("Location: index.php");
-            exit();
-        } else {
-            $errors[] = "Thêm thất bại. Slug có thể bị trùng.";
+                header("Location: index.php");
+                exit();
+            } else {
+                $errors[] = "Thêm thất bại. Slug có thể bị trùng.";
+            }
         }
     }
 }
@@ -106,6 +153,16 @@ ob_start();
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Số lượng</label>
                     <input type="number" name="quantity" class="form-control" value="<?= isset($_POST['quantity']) ? htmlspecialchars($_POST['quantity']) : '0' ?>">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="text-center mb-3" id="preview"></div>
+                    <label class="form-label">Hình ảnh</label>
+                    <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <div class="text-center mb-3" id="preview-gallery"></div>
+                    <label class="form-label">Hình ảnh phụ (Gallery)</label>
+                    <input type="file" id="images" name="images[]" class="form-control" accept="image/*" multiple>
                 </div>
                 <div class="col-md-12 mb-3">
                     <label class="form-label">Mô tả</label>

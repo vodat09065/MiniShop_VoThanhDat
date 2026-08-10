@@ -33,6 +33,16 @@ ob_start();
                     <td><?= htmlspecialchars($category->slug) ?></td>
                 </tr>
                 <tr>
+                    <th>Hình ảnh</th>
+                    <td>
+                        <?php if (!empty($category->image)): ?>
+                            <img src="/MiniShop_VoThanhDat/uploads/categories/<?= htmlspecialchars($category->image) ?>" class="img-thumbnail" width="150">
+                        <?php else: ?>
+                            <span class="text-muted">No Image</span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
                     <th>Mô tả</th>
                     <td><?= nl2br(htmlspecialchars($category->description)) ?></td>
                 </tr>

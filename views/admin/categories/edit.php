@@ -25,9 +25,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($errors)) {
-        $category->catename = $cateName;
+        $imageName = $category->image;
+        $fileName = $_FILES["image"]["name"] ?? "";
+        if ($fileName != "") {
+            $tmpName = $_FILES["image"]["tmp_name"] ?? "";
+            $fileSize = $_FILES["image"]["size"] ?? 0;
+            $error = $_FILES["image"]["error"] ?? 0;
+            
+            if ($error != UPLOAD_ERR_OK) {
+                $errors[] = "Upload hình ảnh không thành công.";
+            }
+            
+            $allowExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            if (!in_array($extension, $allowExtensions)) {
+                $errors[] = "Chỉ cho phép file JPG, JPEG, PNG, GIF hoặc WEBP.";
+            }
+            
+            $maxSize = 200 * 1024;
+            if ($fileSize > $maxSize) {
+                $errors[] = "Kích thước hình ảnh <= 200 KB.";
+            }
+            
+            if (empty($errors)) {
+                $imageName = time() . "_" . $slug . "." . $extension;
+                $uploadPath = __DIR__ . "/../../../uploads/categories/" . $imageName;
+                if (!empty($category->image)) {
+                    $oldImage = __DIR__ . "/../../../uploads/categories/" . $category->image;
+                    if (file_exists($oldImage) && is_file($oldImage)) {
+                        unlink($oldImage);
+                    }
+                }
+                move_uploaded_file($tmpName, $uploadPath);
+            }
+        }
+
+        if (empty($errors)) {
+            $category->catename = $cateName;
         $category->slug = $slug;
         $category->description = $description;
+        $category->image = $imageName;
         $category->status = $status;
         
         if ($categoryDAO->update($category)) {
@@ -58,7 +95,7 @@ ob_start();
             </div>
         <?php endif; ?>
 
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="categoryId" value="<?= $category->id ?>">
             <div class="mb-3">
                 <label class="form-label">Tên danh mục <span class="text-danger">*</span></label>
@@ -67,6 +104,15 @@ ob_start();
             <div class="mb-3">
                 <label class="form-label">Slug <span class="text-danger">*</span></label>
                 <input type="text" name="slug" class="form-control" value="<?= htmlspecialchars($category->slug) ?>">
+            </div>
+            <div class="mb-3">
+                <div class="text-center mb-3" id="preview">
+                    <?php if (!empty($category->image)): ?>
+                        <img src="/MiniShop_VoThanhDat/uploads/categories/<?= htmlspecialchars($category->image) ?>" class="img-thumbnail" width="150">
+                    <?php endif; ?>
+                </div>
+                <label class="form-label">Hình ảnh mới</label>
+                <input type="file" id="image" name="image" class="form-control" accept="image/*">
             </div>
             <div class="mb-3">
                 <label class="form-label">Mô tả</label>
