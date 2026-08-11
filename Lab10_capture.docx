@@ -1,0 +1,54 @@
+﻿<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset='utf-8'>
+<title>Trả lời câu hỏi lý thuyết Lab 10</title>
+<style>
+body { font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5; margin: 2cm; }
+h1 { font-size: 18pt; text-align: center; color: #000; }
+h3 { font-size: 14pt; color: #000; text-decoration: underline; }
+p, li { margin-bottom: 10px; }
+strong { font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>BÁI TẬP THỰC HÀNH LAB 10 - TRẢ LỜI CÂU HỎI LÝ THUYẾT</h1>
+<p><i>(Dành chỗ để chèn hình ảnh kết quả kiểm tra vào sau)</i></p>
+<br>
+
+<h3>1. Middleware</h3>
+<p><b>a. AuthMiddleware:</b> Kiểm tra xem người dùng đã đăng nhập chưa. Nếu chưa đăng nhập, nó sẽ điều hướng người dùng quay lại trang đăng nhập (login.php) để bảo vệ các trang quản trị không bị truy cập trái phép.</p>
+<p><b>b. GuestMiddleware:</b> Kiểm tra xem người dùng đã đăng nhập chưa. Nếu đã đăng nhập rồi (đã có Session), nó sẽ chặn không cho người dùng truy cập lại trang đăng nhập hoặc trang đăng ký, mà tự động chuyển hướng thẳng vào trang quản trị (dashboard).</p>
+<p><b>c. CsrfMiddleware:</b> Dùng để tạo ra một mã token ngẫu nhiên (CSRF Token) lưu vào Session và nhúng vào các Form. Khi Form được submit, middleware này sẽ kiểm tra xem Token gửi lên có khớp với Token trong Session không để chống lại kiểu tấn công giả mạo yêu cầu (CSRF).</p>
+
+<h3>2. Session và Cookie:</h3>
+<p><b>a. Phân biệt Session và Cookie:</b></p>
+<ul>
+    <li><b>Session:</b> Lưu trữ dữ liệu ở phía Server (máy chủ). Dữ liệu sẽ mất đi khi đóng trình duyệt hoặc hết thời gian timeout. An toàn hơn Cookie vì người dùng không thể xem hay chỉnh sửa trực tiếp.</li>
+    <li><b>Cookie:</b> Lưu trữ dữ liệu ở phía Client (trình duyệt của người dùng). Dữ liệu có thể thiết lập thời gian sống (có thể tồn tại ngay cả khi đóng trình duyệt). Kém an toàn hơn vì người dùng có thể can thiệp hoặc xem được nội dung.</li>
+</ul>
+<p><b>b. \["user"] dùng để làm gì?</b> Dùng để lưu trữ toàn bộ thông tin của người dùng (như ID, tên, quyền hạn...) sau khi họ đăng nhập thành công. Nhờ đó, hệ thống có thể nhận diện người dùng ở các trang khác nhau mà không cần họ phải đăng nhập lại.</p>
+<p><b>c. GET/POST truyền dữ liệu khác gì với Session?</b></p>
+<ul>
+    <li>GET/POST truyền dữ liệu trực tiếp trong từng Request cụ thể (qua URL với GET hoặc qua body với POST). Dữ liệu này chỉ tồn tại trong chính Request đó, sang Request tiếp theo sẽ mất nếu không được truyền lại.</li>
+    <li>Session lưu trữ dữ liệu xuyên suốt qua nhiều Request khác nhau trong cùng một phiên làm việc, không cần phải gửi lại dữ liệu ở mỗi Request.</li>
+</ul>
+<p><b>d. Trình bày quá trình Session hoạt động khi chuyển Request:</b><br>Khi khởi tạo Session (ví dụ lúc đăng nhập), Server sinh ra một <code>Session ID</code> duy nhất và gửi nó cho trình duyệt lưu vào Cookie (thường tên là PHPSESSID). Ở các Request tiếp theo, trình duyệt tự động đính kèm Cookie PHPSESSID này gửi lên Server. Server nhận được Session ID, tìm trong bộ nhớ của nó để lấy ra dữ liệu Session tương ứng (như thông tin user) và duy trì trạng thái đăng nhập.</p>
+
+<h3>3. Đăng nhập, bảo mật và phân quyền:</h3>
+<p><b>a. password_verify() dùng để làm gì?</b> Dùng để so sánh một mật khẩu gốc (dạng plain text mà người dùng nhập vào Form) với một chuỗi mật khẩu đã được mã hóa băm (hash) trước đó trong Database xem chúng có khớp nhau hay không.</p>
+<p><b>b. Bcrypt là gì? Vì sao cần lưu dạng hash bằng Bcrypt?</b><br>
+Bcrypt là một thuật toán băm (hashing algorithm) được thiết kế đặc biệt để mã hóa mật khẩu, có tính năng "salting" (thêm chuỗi ngẫu nhiên) và "key stretching" (làm chậm quá trình băm) giúp chống lại các cuộc tấn công dò mật khẩu (Brute-force). Mật khẩu trong Database cần lưu bằng Bcrypt để nếu Database bị lộ, hacker cũng không thể dịch ngược ra mật khẩu gốc.<br>
+<i>Một số thuật toán hash khác:</i> MD5, SHA-1 (hai thuật toán này đã cũ và không an toàn cho mật khẩu), SHA-256, Argon2.</p>
+<p><b>c. Vì sao cần kiểm tra Session trước khi cho phép truy cập Admin?</b> Để đảm bảo rằng chỉ có những người đã xác thực thành công (đã đăng nhập) mới được phép vào hệ thống quản trị, ngăn chặn người lạ hoặc hacker gõ URL truy cập trực tiếp vào dữ liệu hệ thống.</p>
+<p><b>d. Khi đăng xuất, cần thực hiện thao tác nào với Session?</b> Cần xóa các biến dữ liệu trong Session (session_unset) và phá hủy hoàn toàn Session trên Server (session_destroy).</p>
+<p><b>e. CSRF Token dùng để làm gì?</b> Dùng để đảm bảo rằng các Request thay đổi dữ liệu (như POST, DELETE) thực sự xuất phát từ chính website mình, chứ không phải bị giả mạo từ một website độc hại khác của hacker.</p>
+<p><b>f. Điều gì xảy ra khi CSRF Token không hợp lệ?</b> Hệ thống sẽ từ chối xử lý Request đó, báo lỗi (ví dụ: "CSRF Token không hợp lệ") và dừng chương trình để bảo vệ dữ liệu.</p>
+<p><b>g. Phân biệt Authentication và Authorization:</b></p>
+<ul>
+    <li><b>Authentication (Xác thực):</b> Là quá trình kiểm tra "Bạn là ai?" (Ví dụ trong hệ thống MiniShop: Người dùng nhập đúng Username và Password ở màn hình Login để hệ thống xác nhận danh tính và cho phép vào Dashboard).</li>
+    <li><b>Authorization (Phân quyền):</b> Là quá trình kiểm tra "Bạn được phép làm gì?" (Ví dụ trong hệ thống MiniShop: Sau khi vào hệ thống, User có Role là 'Admin' có quyền thêm/sửa/xóa sản phẩm, còn User có Role là 'Staff' chỉ có quyền xem danh sách sản phẩm và không được quyền sửa xóa).</li>
+</ul>
+
+</body>
+</html>
