@@ -263,4 +263,63 @@ class ProductDAO extends BaseDAO
             throw $e;
         }
     }
+
+    public function getPage(int $limit, int $offset, string $keyword = "", string $sort = ""): array
+    {
+        $products = [];
+        try {
+            $sql = "SELECT p.*, c.catename, b.brandname 
+                    FROM products p
+                    INNER JOIN categories c ON p.category_id = c.id
+                    INNER JOIN brands b ON p.brand_id = b.id";
+            
+            if ($keyword != "") {
+                $sql .= " WHERE p.proname LIKE ?";
+            }
+            
+            $orderBy = "p.id DESC";
+            if ($sort == "name_asc") $orderBy = "p.proname ASC";
+            elseif ($sort == "name_desc") $orderBy = "p.proname DESC";
+            elseif ($sort == "price_asc") $orderBy = "p.price ASC";
+            elseif ($sort == "price_desc") $orderBy = "p.price DESC";
+
+            $sql .= " ORDER BY $orderBy LIMIT ? OFFSET ?";
+            
+            $stmt = $this->prepare($sql);
+            
+            if ($keyword != "") {
+                $searchTerm = "%$keyword%";
+                $stmt->bind_param("sii", $searchTerm, $limit, $offset);
+            } else {
+                $stmt->bind_param("ii", $limit, $offset);
+            }
+            
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $product = new Product(
+                    $row["category_id"],
+                    $row["brand_id"],
+                    $row["proname"],
+                    $row["slug"],
+                    $row["price"],
+                    $row["discount_price"],
+                    $row["quantity"],
+                    $row["image"],
+                    $row["description"],
+                    $row["status"]
+                );
+                $product->id = $row["id"];
+                $product->catename = $row["catename"];
+                $product->brandname = $row["brandname"];
+                $product->createdAt = $row["created_at"];
+                $product->updatedAt = $row["updated_at"];
+                $products[] = $product;
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        return $products;
+    }
 }

@@ -43,4 +43,30 @@ class BaseDAO extends Database
     {
         $this->conn->close();
     }
+
+    // Lấy tổng số bản ghi
+    public function count(string $table, string $column = "", string $keyword = ""): int
+    {
+        if ($keyword == "") {
+            $sql = "SELECT COUNT(*) AS total FROM $table";
+            $result = $this->conn->query($sql);
+            if ($result && $row = $result->fetch_assoc()) {
+                return (int)$row["total"];
+            }
+            return 0;
+        }
+
+        $sql = "SELECT COUNT(*) AS total FROM $table WHERE $column LIKE ?";
+        $stmt = $this->conn->prepare($sql);
+        if ($stmt) {
+            $searchTerm = "%$keyword%";
+            $stmt->bind_param("s", $searchTerm);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                return (int)$row["total"];
+            }
+        }
+        return 0;
+    }
 }

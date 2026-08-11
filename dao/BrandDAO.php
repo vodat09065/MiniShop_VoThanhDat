@@ -125,4 +125,44 @@ class BrandDAO extends BaseDAO
             throw $e;
         }
     }
+
+    public function getPage(int $limit, int $offset, string $keyword = ""): array
+    {
+        $brands = [];
+        try {
+            $sql = "SELECT * FROM brands";
+            if ($keyword != "") {
+                $sql .= " WHERE brandname LIKE ?";
+            }
+            $sql .= " ORDER BY id DESC LIMIT ? OFFSET ?";
+            
+            $stmt = $this->prepare($sql);
+            if ($keyword != "") {
+                $searchTerm = "%$keyword%";
+                $stmt->bind_param("sii", $searchTerm, $limit, $offset);
+            } else {
+                $stmt->bind_param("ii", $limit, $offset);
+            }
+            
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $brand = new Brand(
+                    $row["brandname"],
+                    $row["slug"],
+                    $row["image"],
+                    $row["description"],
+                    $row["status"]
+                );
+                $brand->id = $row["id"];
+                $brand->createdAt = $row["created_at"];
+                $brand->updatedAt = $row["updated_at"];
+                $brands[] = $brand;
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        return $brands;
+    }
 }

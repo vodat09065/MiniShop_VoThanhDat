@@ -135,4 +135,44 @@ class CategoryDAO extends BaseDAO
             throw $e;
         }
     }
+
+    public function getPage(int $limit, int $offset, string $keyword = ""): array
+    {
+        $categories = [];
+        try {
+            $sql = "SELECT * FROM categories";
+            if ($keyword != "") {
+                $sql .= " WHERE catename LIKE ?";
+            }
+            $sql .= " ORDER BY id DESC LIMIT ? OFFSET ?";
+            
+            $stmt = $this->prepare($sql);
+            if ($keyword != "") {
+                $searchTerm = "%$keyword%";
+                $stmt->bind_param("sii", $searchTerm, $limit, $offset);
+            } else {
+                $stmt->bind_param("ii", $limit, $offset);
+            }
+            
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $category = new Category(
+                    $row["catename"],
+                    $row["slug"],
+                    $row["image"],
+                    $row["description"],
+                    $row["status"]
+                );
+                $category->id = $row["id"];
+                $category->createdAt = $row["created_at"];
+                $category->updatedAt = $row["updated_at"];
+                $categories[] = $category;
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        return $categories;
+    }
 }

@@ -17,7 +17,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["btnDelete"])) {
     }
 }
 
-$products = $productDAO->getAll($keyword);
+$limit = (int)($_GET["limit"] ?? 10);
+$page = (int)($_GET["page"] ?? 1);
+$offset = ($page - 1) * $limit;
+$sort = $_GET["sort"] ?? "";
+
+$totalRecords = $productDAO->count("products", "proname", $keyword);
+$totalPages = ceil($totalRecords / $limit);
+
+$products = $productDAO->getPage($limit, $offset, $keyword, $sort);
 $pageTitle = "Quản lý sản phẩm";
 ob_start();
 ?>
@@ -38,11 +46,45 @@ ob_start();
         <form class="row mb-3" method="GET">
             <div class="col-md-4">
                 <input type="text" name="keyword" class="form-control" placeholder="Tên sản phẩm, danh mục, thương hiệu..." value="<?= htmlspecialchars($keyword) ?>">
+                <input type="hidden" name="limit" value="<?= $limit ?>">
+                <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
             </div>
         </form>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex gap-4">
+                <div class="d-flex align-items-center">
+                    <label class="me-2 text-nowrap">Hiển thị:</label>
+                    <form method="GET">
+                        <input type="hidden" name="keyword" value="<?= htmlspecialchars($keyword) ?>">
+                        <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
+                        <select name="limit" class="form-select" onchange="this.form.submit()">
+                            <option value="10" <?= $limit == 10 ? 'selected' : '' ?>>10</option>
+                            <option value="20" <?= $limit == 20 ? 'selected' : '' ?>>20</option>
+                            <option value="30" <?= $limit == 30 ? 'selected' : '' ?>>30</option>
+                        </select>
+                    </form>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <label class="me-2 text-nowrap">Sắp xếp:</label>
+                    <form method="GET">
+                        <input type="hidden" name="keyword" value="<?= htmlspecialchars($keyword) ?>">
+                        <input type="hidden" name="limit" value="<?= $limit ?>">
+                        <select name="sort" class="form-select" onchange="this.form.submit()">
+                            <option value="">Mặc định (Mới nhất)</option>
+                            <option value="name_asc" <?= $sort == 'name_asc' ? 'selected' : '' ?>>Tên A-Z</option>
+                            <option value="name_desc" <?= $sort == 'name_desc' ? 'selected' : '' ?>>Tên Z-A</option>
+                            <option value="price_asc" <?= $sort == 'price_asc' ? 'selected' : '' ?>>Giá tăng dần</option>
+                            <option value="price_desc" <?= $sort == 'price_desc' ? 'selected' : '' ?>>Giá giảm dần</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <div class="table-responsive">
             <table class="table table-hover table-bordered align-middle">
@@ -105,6 +147,33 @@ ob_start();
                 </tbody>
             </table>
         </div>
+
+        <?php if ($totalPages > 1): ?>
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+                <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?limit=<?= $limit ?>&keyword=<?= urlencode($keyword) ?>&sort=<?= urlencode($sort) ?>&page=1">Đầu</a>
+                </li>
+                <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?limit=<?= $limit ?>&keyword=<?= urlencode($keyword) ?>&sort=<?= urlencode($sort) ?>&page=<?= $page - 1 ?>">Trước</a>
+                </li>
+                
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                        <a class="page-link" href="?limit=<?= $limit ?>&keyword=<?= urlencode($keyword) ?>&sort=<?= urlencode($sort) ?>&page=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+                
+                <li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?limit=<?= $limit ?>&keyword=<?= urlencode($keyword) ?>&sort=<?= urlencode($sort) ?>&page=<?= $page + 1 ?>">Sau</a>
+                </li>
+                <li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?limit=<?= $limit ?>&keyword=<?= urlencode($keyword) ?>&sort=<?= urlencode($sort) ?>&page=<?= $totalPages ?>">Cuối</a>
+                </li>
+            </ul>
+        </nav>
+        <?php endif; ?>
+
     </div>
 </div>
 
