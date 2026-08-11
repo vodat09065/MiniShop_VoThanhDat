@@ -11,6 +11,7 @@ if (!$customer) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    CsrfMiddleware::verify();
     $fullname = trim($_POST["fullname"] ?? "");
     $phone = trim($_POST["phone"] ?? "");
     $email = trim($_POST["email"] ?? "");
@@ -56,6 +57,7 @@ ob_start();
         <?php endif; ?>
 
         <form method="POST">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
             <div class="mb-3">
                 <label class="form-label">Họ tên <span class="text-danger">*</span></label>
                 <input type="text" name="fullname" class="form-control" value="<?= htmlspecialchars($customer->fullname) ?>">

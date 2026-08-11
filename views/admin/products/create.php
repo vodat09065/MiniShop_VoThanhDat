@@ -12,6 +12,7 @@ $brands = $brandDAO->getAll();
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    CsrfMiddleware::verify();
     $productName = trim($_POST["productName"] ?? "");
     $slug = trim($_POST["slug"] ?? "");
     $categoryId = $_POST["categoryId"] ?? 0;
@@ -111,6 +112,7 @@ ob_start();
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>

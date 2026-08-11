@@ -8,6 +8,7 @@ if (isset($_GET["keyword"])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["btnDelete"])) {
+    CsrfMiddleware::verify();
     $id = $_POST["id"] ?? 0;
     if ($brandDAO->delete($id)) {
         header("Location: index.php?msg=deleted");
@@ -106,6 +107,7 @@ ob_start();
                                     <a href="detail.php?id=<?= $item->id ?>" class="btn btn-info btn-sm text-white"><i class="fas fa-eye"></i> Chi tiết</a>
                                     <a href="edit.php?id=<?= $item->id ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Sửa</a>
                                     <form method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa?');" style="display:inline;">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
                                         <input type="hidden" name="id" value="<?= $item->id ?>">
                                         <button type="submit" name="btnDelete" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
                                     </form>

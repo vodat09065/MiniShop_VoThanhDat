@@ -12,6 +12,7 @@ if (!$order) {
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    CsrfMiddleware::verify();
     $status = $_POST["status"] ?? 0;
 
     if ($orderDAO->updateStatus($id, $status)) {
@@ -44,6 +45,7 @@ ob_start();
                 <?php endif; ?>
 
                 <form method="POST">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
                     <div class="mb-4">
                         <label class="form-label d-block fw-bold">Chọn trạng thái mới:</label>
                         

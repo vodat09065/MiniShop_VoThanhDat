@@ -5,6 +5,7 @@ $userDAO = new UserDAO();
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    CsrfMiddleware::verify();
     $fullname = trim($_POST["fullname"] ?? "");
     $username = trim($_POST["username"] ?? "");
     $password = $_POST["password"] ?? "";
@@ -52,6 +53,7 @@ ob_start();
         <?php endif; ?>
 
         <form method="POST">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Họ tên <span class="text-danger">*</span></label>

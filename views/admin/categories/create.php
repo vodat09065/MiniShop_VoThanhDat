@@ -5,6 +5,7 @@ $categoryDAO = new CategoryDAO();
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    CsrfMiddleware::verify();
     $cateName = trim($_POST["cateName"] ?? "");
     $slug = trim($_POST["slug"] ?? "");
     $description = trim($_POST["description"] ?? "");
@@ -80,6 +81,7 @@ ob_start();
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
             <div class="mb-3">
                 <label class="form-label">Tên danh mục <span class="text-danger">*</span></label>
                 <input type="text" name="cateName" class="form-control" value="<?= isset($_POST['cateName']) ? htmlspecialchars($_POST['cateName']) : '' ?>">
