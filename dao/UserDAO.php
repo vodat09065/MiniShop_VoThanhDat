@@ -161,8 +161,8 @@ class UserDAO extends BaseDAO
 
             while ($row = $result->fetch_assoc()) {
                 $user = new User(
-                    $row["username"],
                     $row["fullname"],
+                    $row["username"],
                     $row["password"],
                     $row["email"],
                     $row["phone"],
@@ -195,8 +195,8 @@ class UserDAO extends BaseDAO
         }
         
         $user = new User(
-            $row["username"],
             $row["fullname"],
+            $row["username"],
             $row["password"],
             $row["email"],
             $row["phone"],
