@@ -40,6 +40,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user->status = $status;
 
         if ($userDAO->update($user)) {
+            // Cập nhật lại session nếu người dùng đang sửa tài khoản của chính mình
+            if (isset($_SESSION['user']) && $_SESSION['user']->id == $user->id) {
+                $_SESSION['user'] = $user;
+            }
             header("Location: index.php");
             exit();
         } else {
