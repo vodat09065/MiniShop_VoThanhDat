@@ -1,7 +1,9 @@
 <?php
-require_once "../../../dao/CategoryDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$categoryDAO = new CategoryDAO();
+
+
+$categoryDAO = new \DAO\CategoryDAO();
 $id = $_GET["id"] ?? 0;
 $category = $categoryDAO->findById($id);
 

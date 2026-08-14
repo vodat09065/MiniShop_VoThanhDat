@@ -1,7 +1,9 @@
 <?php
-require_once "../../../dao/OrderDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$orderDAO = new OrderDAO();
+
+
+$orderDAO = new \DAO\OrderDAO();
 $id = $_GET["id"] ?? 0;
 $order = $orderDAO->findById($id);
 
@@ -12,7 +14,7 @@ if (!$order) {
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    CsrfMiddleware::verify();
+    \Middleware\CsrfMiddleware::verify();
     $status = $_POST["status"] ?? 0;
 
     if ($orderDAO->updateStatus($id, $status)) {

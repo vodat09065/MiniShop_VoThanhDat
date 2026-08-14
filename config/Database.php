@@ -1,4 +1,8 @@
 <?php
+namespace Config;
+use \mysqli;
+use \Exception;
+
 class Database
 {
     protected string $host = "localhost";

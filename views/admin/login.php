@@ -1,51 +1,8 @@
 <?php
-require_once "../../dao/UserDAO.php";
-require_once "../../middleware/GuestMiddleware.php";
-require_once "../../middleware/CsrfMiddleware.php";
-
-GuestMiddleware::handle();
-CsrfMiddleware::generateToken();
-
-session_start();
-
-$errors = [];
-$username = "";
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    CsrfMiddleware::verify();
-    
-    $username = trim($_POST["username"] ?? "");
-    $password = $_POST["password"] ?? "";
-
-    // validate
-    if ($username === "") {
-        $errors["username"] = "Vui lòng nhập tên đăng nhập.";
-    }
-    if ($password === "") {
-        $errors["password"] = "Vui lòng nhập mật khẩu.";
-    }
-
-    // Nếu không có lỗi thì tìm user
-    if (empty($errors)) {
-        $userDAO = new UserDAO();
-        $user = $userDAO->findByUsername($username);
-
-        if (!$user) {
-            $errors["username"] = "Tên đăng nhập không tồn tại.";
-        } elseif (!password_verify($password, $user->password)) {
-            $errors["password"] = "Mật khẩu không chính xác.";
-        } else {
-            // Kiểm tra trạng thái tài khoản
-            if ($user->status != 1) {
-                $errors["username"] = "Tài khoản của bạn đã bị vô hiệu hóa.";
-            } else {
-                $_SESSION["user"] = $user;
-                // Chuyển đến Dashboard
-                header("Location: dashboard.php");
-                exit;
-            }
-        }
-    }
+// Logic has been moved to AuthController
+if (!isset($username) || !isset($errors)) {
+    header("Location: /MiniShop_VoThanhDat/index.php?area=admin&controller=auth&action=login");
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -63,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="card shadow">
                 <div class="card-body p-4">
                     <h3 class="text-center mb-4">Đăng nhập</h3>
-                    <form action="login.php" method="POST">
+                    <form action="/MiniShop_VoThanhDat/index.php?area=admin&controller=auth&action=login" method="POST">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
                         <div class="mb-3">
                             <label class="form-label">Tên đăng nhập</label>

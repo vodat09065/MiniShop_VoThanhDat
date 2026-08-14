@@ -1,2 +1,9 @@
-# Cấu hình Apache
-Options -Indexes
+RewriteEngine On
+RewriteBase /MiniShop_VoThanhDat/
+
+# Không rewrite file và thư mục có thật
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Đưa mọi request về Entry Point index.php
+RewriteRule ^ index.php [QSA,L]

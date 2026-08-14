@@ -1,4 +1,6 @@
 <?php
+namespace Middleware;
+
 class AuthMiddleware
 {
     public static function handle()

@@ -1,7 +1,9 @@
 <?php
-require_once "../../../dao/OrderDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$orderDAO = new OrderDAO();
+
+
+$orderDAO = new \DAO\OrderDAO();
 $keyword = "";
 if (isset($_GET["keyword"])) {
     $keyword = trim($_GET["keyword"]);

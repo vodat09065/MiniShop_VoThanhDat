@@ -1,9 +1,11 @@
 <?php
-require_once "../../../middleware/RoleMiddleware.php";
-RoleMiddleware::checkAdmin();
-require_once "../../../dao/UserDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$userDAO = new UserDAO();
+
+\Middleware\RoleMiddleware::checkAdmin();
+
+
+$userDAO = new \DAO\UserDAO();
 $errors = [];
 $id = $_GET["id"] ?? 0;
 $user = $userDAO->findById($id);
@@ -13,7 +15,7 @@ if (!$user) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    CsrfMiddleware::verify();
+    \Middleware\CsrfMiddleware::verify();
     $fullname = trim($_POST["fullname"] ?? "");
     $username = trim($_POST["username"] ?? "");
     $password = $_POST["password"] ?? "";

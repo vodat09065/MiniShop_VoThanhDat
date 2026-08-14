@@ -1,9 +1,11 @@
 <?php
-require_once "../../../dao/OrderDAO.php";
-require_once "../../../dao/OrderDetailDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$orderDAO = new OrderDAO();
-$orderDetailDAO = new OrderDetailDAO();
+
+
+
+$orderDAO = new \DAO\OrderDAO();
+$orderDetailDAO = new \DAO\OrderDetailDAO();
 
 $id = $_GET["id"] ?? 0;
 $order = $orderDAO->findById($id);

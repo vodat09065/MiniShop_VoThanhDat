@@ -1,16 +1,18 @@
 <?php
-require_once "../../../middleware/RoleMiddleware.php";
-RoleMiddleware::checkAdmin();
-require_once "../../../dao/UserDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$userDAO = new UserDAO();
+
+\Middleware\RoleMiddleware::checkAdmin();
+
+
+$userDAO = new \DAO\UserDAO();
 $keyword = "";
 if (isset($_GET["keyword"])) {
     $keyword = trim($_GET["keyword"]);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["btnDelete"])) {
-    CsrfMiddleware::verify();
+    \Middleware\CsrfMiddleware::verify();
     $id = $_POST["id"] ?? 0;
     if ($userDAO->delete($id)) {
         header("Location: index.php?msg=deleted");

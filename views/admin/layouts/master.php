@@ -1,16 +1,16 @@
 <?php 
-require_once __DIR__ . '/../../../models/User.php';
-require_once __DIR__ . '/../../../middleware/AuthMiddleware.php';
-require_once __DIR__ . '/../../../middleware/CsrfMiddleware.php';
-AuthMiddleware::handle();
-CsrfMiddleware::generateToken();
+use Middleware\AuthMiddleware;
+use Middleware\CsrfMiddleware;
+
+\Middleware\AuthMiddleware::handle();
+\Middleware\CsrfMiddleware::generateToken();
 
 $user = $_SESSION["user"] ?? null;
-include "header.php"; 
+include __DIR__ . "/header.php"; 
 ?>
 <div class="container-fluid">
     <div class="row">
-        <?php include "sidebar.php"; ?>
+        <?php include __DIR__ . "/sidebar.php"; ?>
         <div class="col-md-10 content-area">
             <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                 <h2><?= isset($pageTitle) ? $pageTitle : "Trang quản trị" ?></h2>
@@ -20,7 +20,7 @@ include "header.php";
                     <span>
                         <?= $user ? htmlspecialchars($user->fullname) : 'Khách' ?>
                     </span>
-                    <a href="/Minishop_VoThanhDat/views/admin/logout.php" class="text-decoration-none text-danger ms-3">
+                    <a href="/MiniShop_VoThanhDat/index.php?area=admin&controller=auth&action=logout" class="text-decoration-none text-danger ms-3">
                         <i class="fas fa-sign-out-alt"></i> Đăng xuất
                     </a>
                 </div>
@@ -29,4 +29,4 @@ include "header.php";
         </div>
     </div>
 </div>
-<?php include "footer.php"; ?>
+<?php include __DIR__ . "/footer.php"; ?>

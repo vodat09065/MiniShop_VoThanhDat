@@ -1,5 +1,9 @@
 <?php
-require_once __DIR__ . "/../config/Database.php";
+namespace DAO;
+
+use Config\Database;
+use \mysqli_result;
+use \mysqli_stmt;
 
 class BaseDAO extends Database
 {

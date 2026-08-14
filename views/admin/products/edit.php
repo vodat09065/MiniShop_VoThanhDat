@@ -1,11 +1,13 @@
 <?php
-require_once "../../../dao/ProductDAO.php";
-require_once "../../../dao/CategoryDAO.php";
-require_once "../../../dao/BrandDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$productDAO = new ProductDAO();
-$categoryDAO = new CategoryDAO();
-$brandDAO = new BrandDAO();
+
+
+
+
+$productDAO = new \DAO\ProductDAO();
+$categoryDAO = new \DAO\CategoryDAO();
+$brandDAO = new \DAO\BrandDAO();
 
 $id = $_GET["id"] ?? 0;
 $product = $productDAO->findById($id);
@@ -19,7 +21,7 @@ $brands = $brandDAO->getAll();
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    CsrfMiddleware::verify();
+    \Middleware\CsrfMiddleware::verify();
     if (isset($_POST["btnDeleteImage"])) {
         $imgId = (int)$_POST["deleteImageId"];
         $productDAO->deleteImage($imgId);

@@ -1,14 +1,16 @@
 <?php
-require_once "../../../dao/CustomerDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$customerDAO = new CustomerDAO();
+
+
+$customerDAO = new \DAO\CustomerDAO();
 $keyword = "";
 if (isset($_GET["keyword"])) {
     $keyword = trim($_GET["keyword"]);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["btnDelete"])) {
-    CsrfMiddleware::verify();
+    \Middleware\CsrfMiddleware::verify();
     $id = $_POST["id"] ?? 0;
     if ($customerDAO->delete($id)) {
         header("Location: index.php?msg=deleted");

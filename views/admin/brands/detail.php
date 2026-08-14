@@ -1,7 +1,9 @@
 <?php
-require_once "../../../dao/BrandDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$brandDAO = new BrandDAO();
+
+
+$brandDAO = new \DAO\BrandDAO();
 $id = $_GET["id"] ?? 0;
 $brand = $brandDAO->findById($id);
 

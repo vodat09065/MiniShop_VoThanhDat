@@ -1,40 +1,11 @@
 <?php
-require_once "../../../dao/ProductDAO.php";
-
-$productDAO = new ProductDAO();
-$keyword = "";
-if (isset($_GET["keyword"])) {
-    $keyword = trim($_GET["keyword"]);
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["btnDelete"])) {
-    CsrfMiddleware::verify();
-    $id = $_POST["id"] ?? 0;
-    if ($productDAO->delete($id)) {
-        header("Location: index.php?msg=deleted");
-        exit();
-    } else {
-        $error = "Xóa thất bại! Sản phẩm có thể đang nằm trong đơn hàng.";
-    }
-}
-
-$limit = (int)($_GET["limit"] ?? 10);
-$page = (int)($_GET["page"] ?? 1);
-$offset = ($page - 1) * $limit;
-$sort = $_GET["sort"] ?? "";
-
-$totalRecords = $productDAO->count("products", "proname", $keyword);
-$totalPages = ceil($totalRecords / $limit);
-
-$products = $productDAO->getPage($limit, $offset, $keyword, $sort);
-$pageTitle = "Quản lý sản phẩm";
 ob_start();
 ?>
 
 <div class="card shadow-sm">
     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
         <h5 class="mb-0">Danh sách sản phẩm</h5>
-        <a href="create.php" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm mới</a>
+        <a href="/MiniShop_VoThanhDat/views/admin/products/create.php" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm mới</a>
     </div>
     <div class="card-body">
         <?php if (isset($_GET['msg']) && $_GET['msg'] == 'deleted'): ?>
@@ -130,9 +101,9 @@ ob_start();
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="detail.php?id=<?= $item->id ?>" class="btn btn-info btn-sm text-white"><i class="fas fa-eye"></i></a>
-                                    <a href="edit.php?id=<?= $item->id ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
-                                    <form method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa?');" style="display:inline;">
+                                    <a href="/MiniShop_VoThanhDat/views/admin/products/detail.php?id=<?= $item->id ?>" class="btn btn-info btn-sm text-white"><i class="fas fa-eye"></i></a>
+                                    <a href="/MiniShop_VoThanhDat/views/admin/products/edit.php?id=<?= $item->id ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+                                    <form method="POST" action="/MiniShop_VoThanhDat/index.php?area=admin&controller=product&action=index" onsubmit="return confirm('Bạn có chắc muốn xóa?');" style="display:inline;">
 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
                                         <input type="hidden" name="id" value="<?= $item->id ?>">
                                         <button type="submit" name="btnDelete" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
@@ -181,5 +152,5 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-include "../layouts/master.php";
+include __DIR__ . "/../layouts/master.php";
 ?>

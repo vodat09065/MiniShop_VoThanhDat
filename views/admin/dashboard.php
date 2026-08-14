@@ -1,17 +1,19 @@
 <?php
-require_once "../../dao/CategoryDAO.php";
-require_once "../../dao/BrandDAO.php";
-require_once "../../dao/ProductDAO.php";
-require_once "../../dao/CustomerDAO.php";
-require_once "../../dao/UserDAO.php";
-require_once "../../dao/OrderDAO.php";
+require_once __DIR__ . "/../../autoload.php";
 
-$categoryDAO = new CategoryDAO();
-$brandDAO = new BrandDAO();
-$productDAO = new ProductDAO();
-$customerDAO = new CustomerDAO();
-$userDAO = new UserDAO();
-$orderDAO = new OrderDAO();
+use DAO\CategoryDAO;
+use DAO\BrandDAO;
+use DAO\ProductDAO;
+use DAO\CustomerDAO;
+use DAO\UserDAO;
+use DAO\OrderDAO;
+
+$categoryDAO = new \DAO\CategoryDAO();
+$brandDAO = new \DAO\BrandDAO();
+$productDAO = new \DAO\ProductDAO();
+$customerDAO = new \DAO\CustomerDAO();
+$userDAO = new \DAO\UserDAO();
+$orderDAO = new \DAO\OrderDAO();
 
 $totalCategories = count($categoryDAO->getAll());
 $totalBrands = count($brandDAO->getAll());

@@ -1,7 +1,8 @@
 <?php
-require_once __DIR__ . "/BaseDAO.php";
-require_once __DIR__ . "/../models/Product.php";
+namespace DAO;
 
+use Models\Product;
+use \Exception;
 class ProductDAO extends BaseDAO
 {
     public function __construct()
@@ -215,7 +216,7 @@ class ProductDAO extends BaseDAO
     {
         $list = [];
         try {
-            require_once __DIR__ . "/../models/ProductImage.php";
+            
             $sql = "SELECT * FROM product_images WHERE product_id=? ORDER BY id ASC";
             $stmt = $this->prepare($sql);
             $stmt->bind_param("i", $productId);

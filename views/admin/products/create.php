@@ -1,18 +1,20 @@
 <?php
-require_once "../../../dao/ProductDAO.php";
-require_once "../../../dao/CategoryDAO.php";
-require_once "../../../dao/BrandDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$productDAO = new ProductDAO();
-$categoryDAO = new CategoryDAO();
-$brandDAO = new BrandDAO();
+
+
+
+
+$productDAO = new \DAO\ProductDAO();
+$categoryDAO = new \DAO\CategoryDAO();
+$brandDAO = new \DAO\BrandDAO();
 
 $categories = $categoryDAO->getAll();
 $brands = $brandDAO->getAll();
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    CsrfMiddleware::verify();
+    \Middleware\CsrfMiddleware::verify();
     $productName = trim($_POST["productName"] ?? "");
     $slug = trim($_POST["slug"] ?? "");
     $categoryId = $_POST["categoryId"] ?? 0;

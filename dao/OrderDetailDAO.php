@@ -1,7 +1,8 @@
 <?php
-require_once __DIR__ . "/BaseDAO.php";
-require_once __DIR__ . "/../models/OrderDetail.php";
+namespace DAO;
 
+use Models\OrderDetail;
+use \Exception;
 class OrderDetailDAO extends BaseDAO
 {
     public function __construct()

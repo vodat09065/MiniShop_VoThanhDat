@@ -1,11 +1,13 @@
 <?php
-require_once "../../../dao/CategoryDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$categoryDAO = new CategoryDAO();
+
+
+$categoryDAO = new \DAO\CategoryDAO();
 $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    CsrfMiddleware::verify();
+    \Middleware\CsrfMiddleware::verify();
     $cateName = trim($_POST["cateName"] ?? "");
     $slug = trim($_POST["slug"] ?? "");
     $description = trim($_POST["description"] ?? "");

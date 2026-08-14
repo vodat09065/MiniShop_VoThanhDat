@@ -1,7 +1,9 @@
 <?php
-require_once "../../../dao/BrandDAO.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/MiniShop_VoThanhDat/autoload.php';
 
-$brandDAO = new BrandDAO();
+
+
+$brandDAO = new \DAO\BrandDAO();
 $errors = [];
 $id = $_GET["id"] ?? 0;
 $brand = $brandDAO->findById($id);
@@ -11,7 +13,7 @@ if (!$brand) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    CsrfMiddleware::verify();
+    \Middleware\CsrfMiddleware::verify();
     $brandName = trim($_POST["brandName"] ?? "");
     $slug = trim($_POST["slug"] ?? "");
     $description = trim($_POST["description"] ?? "");
