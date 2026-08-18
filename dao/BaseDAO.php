@@ -25,21 +25,27 @@ class BaseDAO extends Database
     }
 
     // Bắt đầu Transaction
-    protected function beginTransaction(): void
+    public function beginTransaction(): void
     {
         $this->conn->begin_transaction();
     }
 
     // Xác nhận Transaction
-    protected function commit(): void
+    public function commit(): void
     {
         $this->conn->commit();
     }
 
     // Hủy Transaction
-    protected function rollback(): void
+    public function rollback(): void
     {
         $this->conn->rollback();
+    }
+
+    // Lấy ID vừa được chèn
+    public function getLastInsertId(): int|string
+    {
+        return $this->conn->insert_id;
     }
 
     // Đóng kết nối

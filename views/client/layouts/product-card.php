@@ -21,7 +21,7 @@
             <a href="<?= BASE_URL ?>product/<?= $product->slug ?>" class="btn btn-outline-secondary btn-sm rounded-start-pill px-3" title="Xem chi tiết">
               <i class="bi bi-eye"></i>
             </a>
-            <button type="button" class="btn btn-primary btn-sm rounded-end-pill px-3" title="Thêm vào giỏ">
+            <button type="button" class="btn btn-primary btn-sm rounded-end-pill px-3 btn-add-cart" data-productid="<?= $product->id ?>" title="Thêm vào giỏ">
               <i class="bi bi-cart-plus"></i>
             </button>
           </div>

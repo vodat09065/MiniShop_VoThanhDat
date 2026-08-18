@@ -198,4 +198,32 @@ class OrderDAO extends BaseDAO
         }
         return $list;
     }
+
+    public function insert(Order $order): int
+    {
+        try {
+            // Note: user_id allows NULL
+            $sql = "INSERT INTO orders(customer_id, user_id, order_code, total_amount, note, status)
+                    VALUES(?, ?, ?, ?, ?, ?)";
+            $stmt = $this->prepare($sql);
+            
+            $userId = $order->userId > 0 ? $order->userId : null;
+            
+            $stmt->bind_param(
+                "iisdsi",
+                $order->customerId,
+                $userId,
+                $order->orderCode,
+                $order->totalAmount,
+                $order->note,
+                $order->status
+            );
+            if ($stmt->execute()) {
+                return $this->conn->insert_id;
+            }
+            return 0;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
 }

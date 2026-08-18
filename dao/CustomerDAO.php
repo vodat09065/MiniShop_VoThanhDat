@@ -69,6 +69,31 @@ class CustomerDAO extends BaseDAO
         return null;
     }
 
+    public function findByPhone(string $phone): ?Customer
+    {
+        try {
+            $sql = "SELECT * FROM customers WHERE phone=?";
+            $stmt = $this->prepare($sql);
+            $stmt->bind_param("s", $phone);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                $customer = new Customer(
+                    $row["fullname"],
+                    $row["phone"],
+                    $row["email"],
+                    $row["address"],
+                    $row["note"]
+                );
+                $customer->id = $row["id"];
+                return $customer;
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        return null;
+    }
+
     public function insert(Customer $customer): bool
     {
         try {
@@ -83,7 +108,10 @@ class CustomerDAO extends BaseDAO
                 $customer->address,
                 $customer->note
             );
-            return $stmt->execute();
+            if ($stmt->execute()) {
+                return $this->conn->insert_id;
+            }
+            return 0;
         } catch (Exception $e) {
             throw $e;
         }

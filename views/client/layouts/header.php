@@ -53,9 +53,17 @@ $brands = $headerData['brands'];
       </form>
       <div class="d-flex align-items-center">
         <a href="#" class="nav-icon me-4"><i class="bi bi-person fs-5"></i></a>
-        <a href="#" class="nav-icon position-relative">
+        <a href="<?= BASE_URL ?>cart" class="nav-icon position-relative">
           <i class="bi bi-cart fs-5"></i>
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">0</span>
+          <?php
+          $cartCount = 0;
+          if (isset($_SESSION[CART_SESSION_KEY])) {
+              foreach ($_SESSION[CART_SESSION_KEY] as $item) {
+                  $cartCount += $item['quantity'];
+              }
+          }
+          ?>
+          <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><?= $cartCount ?></span>
         </a>
       </div>
     </div>

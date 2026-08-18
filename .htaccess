@@ -14,6 +14,13 @@ RewriteRule ^product/([^/]+)/?$ index.php?area=client&controller=product&action=
 # Tìm kiếm
 RewriteRule ^search/?$ index.php?area=client&controller=product&action=search [L,QSA]
 
+# Giỏ hàng và Checkout
+RewriteRule ^cart/?$ index.php?area=client&controller=cart&action=index [L,QSA]
+RewriteRule ^cart/add/?$ index.php?area=client&controller=cart&action=add [L,QSA]
+RewriteRule ^cart/update/?$ index.php?area=client&controller=cart&action=update [L,QSA]
+RewriteRule ^cart/remove/?$ index.php?area=client&controller=cart&action=remove [L,QSA]
+RewriteRule ^checkout/?$ index.php?area=client&controller=cart&action=checkout [L,QSA]
+
 # Không rewrite file và thư mục có thật
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
