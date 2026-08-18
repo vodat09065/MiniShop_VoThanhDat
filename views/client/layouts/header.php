@@ -5,9 +5,11 @@ $headerData = HeaderComposer::compose();
 $categories = $headerData['categories'];
 $brands = $headerData['brands'];
 ?>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+<nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="<?= BASE_URL ?>">MiniShop</a>
+    <a class="navbar-brand fw-bold" href="<?= BASE_URL ?>">
+      <i class="bi bi-shop me-1"></i> MiniShop
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -45,13 +47,13 @@ $brands = $headerData['brands'];
           </ul>
         </li>
       </ul>
-      <form class="d-flex me-3" action="<?= BASE_URL ?>search" method="GET">
+      <form class="d-flex me-4" action="<?= BASE_URL ?>search" method="GET">
         <input class="form-control me-2" type="search" name="keyword" placeholder="Tìm kiếm sản phẩm..." value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>">
-        <button class="btn btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
       </form>
       <div class="d-flex align-items-center">
-        <a href="#" class="text-light me-3"><i class="bi bi-person fs-5"></i></a>
-        <a href="#" class="text-light position-relative">
+        <a href="#" class="nav-icon me-4"><i class="bi bi-person fs-5"></i></a>
+        <a href="#" class="nav-icon position-relative">
           <i class="bi bi-cart fs-5"></i>
           <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">0</span>
         </a>

@@ -1,13 +1,13 @@
-<div class="text-center py-5 bg-light mb-5 rounded shadow-sm">
-  <h1 class="fw-bold text-primary">Chào mừng đến MiniShop</h1>
-  <p class="text-muted fs-5">Website bán hàng trực tuyến uy tín và chất lượng</p>
-  <a href="#new-products" class="btn btn-primary btn-lg mt-3 px-4 rounded-pill">Khám phá ngay</a>
+<div class="hero-section text-center">
+  <h1 class="fw-bold">Khám Phá Công Nghệ Đỉnh Cao</h1>
+  <p class="mt-3 mb-4">Trải nghiệm các sản phẩm công nghệ tiên tiến nhất với mức giá không thể tốt hơn tại MiniShop.</p>
+  <a href="#new-products" class="btn btn-primary btn-lg rounded-pill px-5">Bắt đầu mua sắm <i class="bi bi-arrow-right ms-2"></i></a>
 </div>
 
-<div class="container">
+<div class="container pb-5">
   <!-- Danh mục nổi bật -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold m-0 border-start border-primary border-4 ps-2">Danh mục nổi bật</h4>
+    <h3 class="section-title m-0">Danh mục nổi bật</h3>
   </div>
   <div class="row">
     <?php foreach ($categories as $category): ?>
@@ -25,7 +25,7 @@
 
   <!-- Sản phẩm giảm giá -->
   <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
-    <h4 class="fw-bold m-0 border-start border-danger border-4 ps-2 text-danger">Đang giảm giá</h4>
+    <h3 class="section-title sale m-0 text-danger">Ưu Đãi Khủng</h3>
   </div>
   <div class="row">
     <?php foreach ($discountProducts as $product): ?>
@@ -37,7 +37,7 @@
 
   <!-- Sản phẩm mới nhất -->
   <div class="d-flex justify-content-between align-items-center mb-4 mt-5" id="new-products">
-    <h4 class="fw-bold m-0 border-start border-primary border-4 ps-2">Sản phẩm mới nhất</h4>
+    <h3 class="section-title m-0">Sản phẩm mới nhất</h3>
   </div>
   <div class="row">
     <?php foreach ($newProducts as $product): ?>
@@ -47,8 +47,3 @@
     <?php endforeach; ?>
   </div>
 </div>
-
-<style>
-.category-card { transition: all 0.3s ease; border: 1px solid #f0f0f0 !important; }
-.category-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; border-color: #0d6efd !important;}
-</style>
