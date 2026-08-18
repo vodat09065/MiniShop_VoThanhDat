@@ -176,4 +176,33 @@ class CategoryDAO extends BaseDAO
         }
         return $categories;
     }
+
+    public function getByLimit(int $limit = 5): array
+    {
+        $categories = [];
+        try {
+            $sql = "SELECT * FROM categories ORDER BY id DESC LIMIT ?";
+            $stmt = $this->prepare($sql);
+            $stmt->bind_param("i", $limit);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $category = new Category(
+                    $row["catename"],
+                    $row["slug"],
+                    $row["image"],
+                    $row["description"],
+                    $row["status"]
+                );
+                $category->id = $row["id"];
+                $category->createdAt = $row["created_at"];
+                $category->updatedAt = $row["updated_at"];
+                $categories[] = $category;
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        return $categories;
+    }
 }

@@ -323,4 +323,130 @@ class ProductDAO extends BaseDAO
         }
         return $products;
     }
+
+    public function getDiscountProducts(int $limit = 8): array
+    {
+        $list = [];
+        try {
+            $sql = "SELECT p.*, c.catename AS cateName, b.brandname AS brandName 
+                    FROM products p
+                    INNER JOIN categories c ON p.category_id = c.id
+                    INNER JOIN brands b ON p.brand_id = b.id
+                    WHERE p.discount_price > 0
+                    ORDER BY p.id DESC LIMIT ?";
+            $stmt = $this->prepare($sql);
+            $stmt->bind_param("i", $limit);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $product = new Product(
+                    $row["category_id"], $row["brand_id"], $row["proname"], $row["slug"],
+                    $row["price"], $row["discount_price"], $row["quantity"], $row["image"],
+                    $row["description"], $row["status"]
+                );
+                $product->id = $row["id"];
+                $product->cateName = $row["cateName"];
+                $product->brandName = $row["brandName"];
+                $list[] = $product;
+            }
+        } catch (Exception $e) { throw $e; }
+        return $list;
+    }
+
+    public function getNewProducts(int $limit = 4): array
+    {
+        return $this->getLatest($limit);
+    }
+
+    public function getByCategory(string $slug): array
+    {
+        $list = [];
+        try {
+            $sql = "SELECT p.*, c.catename AS cateName, b.brandname AS brandName 
+                    FROM products p
+                    INNER JOIN categories c ON p.category_id = c.id
+                    INNER JOIN brands b ON p.brand_id = b.id
+                    WHERE c.slug = ?
+                    ORDER BY p.id DESC";
+            $stmt = $this->prepare($sql);
+            $stmt->bind_param("s", $slug);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $product = new Product(
+                    $row["category_id"], $row["brand_id"], $row["proname"], $row["slug"],
+                    $row["price"], $row["discount_price"], $row["quantity"], $row["image"],
+                    $row["description"], $row["status"]
+                );
+                $product->id = $row["id"];
+                $product->cateName = $row["cateName"];
+                $product->brandName = $row["brandName"];
+                $list[] = $product;
+            }
+        } catch (Exception $e) { throw $e; }
+        return $list;
+    }
+
+    public function getByBrand(string $slug): array
+    {
+        $list = [];
+        try {
+            $sql = "SELECT p.*, c.catename AS cateName, b.brandname AS brandName 
+                    FROM products p
+                    INNER JOIN categories c ON p.category_id = c.id
+                    INNER JOIN brands b ON p.brand_id = b.id
+                    WHERE b.slug = ?
+                    ORDER BY p.id DESC";
+            $stmt = $this->prepare($sql);
+            $stmt->bind_param("s", $slug);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $product = new Product(
+                    $row["category_id"], $row["brand_id"], $row["proname"], $row["slug"],
+                    $row["price"], $row["discount_price"], $row["quantity"], $row["image"],
+                    $row["description"], $row["status"]
+                );
+                $product->id = $row["id"];
+                $product->cateName = $row["cateName"];
+                $product->brandName = $row["brandName"];
+                $list[] = $product;
+            }
+        } catch (Exception $e) { throw $e; }
+        return $list;
+    }
+
+    public function search(string $keyword): array
+    {
+        return $this->getAll($keyword);
+    }
+    
+    public function getBySlug(string $slug): ?Product
+    {
+        try {
+            $sql = "SELECT p.*, c.catename AS cateName, b.brandname AS brandName 
+                    FROM products p
+                    INNER JOIN categories c ON p.category_id = c.id
+                    INNER JOIN brands b ON p.brand_id = b.id 
+                    WHERE p.slug=?";
+            $stmt = $this->prepare($sql);
+            $stmt->bind_param("s", $slug);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                $product = new Product(
+                    $row["category_id"], $row["brand_id"], $row["proname"], $row["slug"],
+                    $row["price"], $row["discount_price"], $row["quantity"], $row["image"],
+                    $row["description"], $row["status"]
+                );
+                $product->id = $row["id"];
+                $product->cateName = $row["cateName"];
+                $product->brandName = $row["brandName"];
+                return $product;
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        return null;
+    }
 }

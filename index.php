@@ -4,7 +4,7 @@ session_start();
 
 // Nhận Request
 $area = $_GET["area"] ?? "client";
-$controller = $_GET["controller"] ?? "product";
+$controller = $_GET["controller"] ?? "home";
 $action = $_GET["action"] ?? "index";
 
 // Kiểm tra Authentication cho Admin
