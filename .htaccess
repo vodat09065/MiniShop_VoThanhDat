@@ -1,9 +1,6 @@
 RewriteEngine On
 RewriteBase /MiniShop_VoThanhDat/
 
-# Không rewrite file và thư mục có thật
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
 
 # Danh mục: /category/laptop
 RewriteRule ^category/([^/]+)/?$ index.php?area=client&controller=product&action=category&slug=$1 [L,QSA]
@@ -17,5 +14,8 @@ RewriteRule ^product/([^/]+)/?$ index.php?area=client&controller=product&action=
 # Tìm kiếm
 RewriteRule ^search/?$ index.php?area=client&controller=product&action=search [L,QSA]
 
+# Không rewrite file và thư mục có thật
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 # Đưa mọi request về Entry Point index.php
 RewriteRule ^ index.php [QSA,L]
