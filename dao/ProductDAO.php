@@ -139,7 +139,7 @@ class ProductDAO extends BaseDAO
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->prepare($sql);
             $stmt->bind_param(
-                "iisssddisi",
+                "iissddissi",
                 $product->categoryId,
                 $product->brandId,
                 $product->proname,
@@ -168,7 +168,7 @@ class ProductDAO extends BaseDAO
                     WHERE id=?";
             $stmt = $this->prepare($sql);
             $stmt->bind_param(
-                "iisssddisii",
+                "iissddissii",
                 $product->categoryId,
                 $product->brandId,
                 $product->proname,
