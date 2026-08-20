@@ -4,6 +4,12 @@ document.querySelectorAll(".btn-add-cart").forEach(button => {
         const productid = this.dataset.productid;
         const formData = new FormData();
         formData.append("productid", productid);
+        
+        // Get quantity if present (on detail page)
+        const qtyInput = document.getElementById("quantity");
+        if (qtyInput) {
+            formData.append("quantity", qtyInput.value);
+        }
 
         fetch(BASE_URL + "cart/add", {
             method: "POST",
@@ -119,3 +125,21 @@ function removeCart(productid) {
         console.error("Lỗi:", error);
     });
 }
+
+// Detail Page Quantity Buttons
+document.addEventListener("DOMContentLoaded", function() {
+    const btnPlus = document.getElementById('btn-plus');
+    const btnMinus = document.getElementById('btn-minus');
+    const qtyInput = document.getElementById('quantity');
+    
+    if (btnPlus && btnMinus && qtyInput) {
+        btnPlus.addEventListener('click', function() {
+            qtyInput.value = parseInt(qtyInput.value) + 1;
+        });
+        btnMinus.addEventListener('click', function() {
+            if (parseInt(qtyInput.value) > 1) {
+                qtyInput.value = parseInt(qtyInput.value) - 1;
+            }
+        });
+    }
+});

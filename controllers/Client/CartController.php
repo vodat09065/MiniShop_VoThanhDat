@@ -47,16 +47,18 @@ class CartController
         }
 
         $price = $product->discountPrice > 0 ? $product->discountPrice : $product->price;
+        $quantity = isset($_POST["quantity"]) ? (int)$_POST["quantity"] : 1;
+        if ($quantity < 1) $quantity = 1;
 
         if (isset($_SESSION[CART_SESSION_KEY][$productid])) {
-            $_SESSION[CART_SESSION_KEY][$productid]["quantity"]++;
+            $_SESSION[CART_SESSION_KEY][$productid]["quantity"] += $quantity;
         } else {
             $_SESSION[CART_SESSION_KEY][$productid] = [
                 "productid" => $product->id,
                 "productname" => $product->proname,
                 "image" => $product->image,
                 "price" => $price,
-                "quantity" => 1
+                "quantity" => $quantity
             ];
         }
 

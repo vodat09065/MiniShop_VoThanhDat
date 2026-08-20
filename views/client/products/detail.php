@@ -46,7 +46,7 @@
                     <input type="text" class="form-control text-center bg-white" value="1" id="quantity" readonly>
                     <button class="btn btn-outline-secondary" type="button" id="btn-plus"><i class="bi bi-plus"></i></button>
                 </div>
-                <button class="btn btn-primary btn-lg px-4 flex-grow-1">
+                <button class="btn btn-primary btn-lg px-4 flex-grow-1 btn-add-cart" data-productid="<?= $product->id ?>">
                     <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
                 </button>
             </div>
@@ -54,15 +54,3 @@
     </div>
 </div>
 
-<script>
-document.getElementById('btn-plus').addEventListener('click', function() {
-    let input = document.getElementById('quantity');
-    input.value = parseInt(input.value) + 1;
-});
-document.getElementById('btn-minus').addEventListener('click', function() {
-    let input = document.getElementById('quantity');
-    if (parseInt(input.value) > 1) {
-        input.value = parseInt(input.value) - 1;
-    }
-});
-</script>
