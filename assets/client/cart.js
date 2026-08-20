@@ -1,7 +1,10 @@
-// Add to Cart
-document.querySelectorAll(".btn-add-cart").forEach(button => {
-    button.addEventListener("click", function () {
-        const productid = this.dataset.productid;
+// Global event delegation for Cart actions
+document.addEventListener("click", function(e) {
+    // 1. Add to Cart Button
+    const addBtn = e.target.closest(".btn-add-cart");
+    if (addBtn) {
+        e.preventDefault();
+        const productid = addBtn.dataset.productid;
         const formData = new FormData();
         formData.append("productid", productid);
         
@@ -35,14 +38,35 @@ document.querySelectorAll(".btn-add-cart").forEach(button => {
                 alert(data.message);
             }
         })
-        .catch(error => {
-            console.error("Lỗi:", error);
-        });
-    });
+        .catch(error => console.error("Lỗi:", error));
+        return;
+    }
+
+    // 2. Detail Page Quantity Plus
+    const btnPlus = e.target.closest("#btn-plus");
+    if (btnPlus) {
+        e.preventDefault();
+        const qtyInput = document.getElementById("quantity");
+        if (qtyInput) {
+            qtyInput.value = parseInt(qtyInput.value) + 1;
+        }
+        return;
+    }
+
+    // 3. Detail Page Quantity Minus
+    const btnMinus = e.target.closest("#btn-minus");
+    if (btnMinus) {
+        e.preventDefault();
+        const qtyInput = document.getElementById("quantity");
+        if (qtyInput && parseInt(qtyInput.value) > 1) {
+            qtyInput.value = parseInt(qtyInput.value) - 1;
+        }
+        return;
+    }
 });
 
-// Update Cart Quantity
-function updateCart(productid, quantity) {
+// Update Cart Quantity (Cart Page)
+window.updateCart = function(productid, quantity) {
     if (quantity < 1) {
         removeCart(productid);
         return;
@@ -82,13 +106,11 @@ function updateCart(productid, quantity) {
             alert(data.message);
         }
     })
-    .catch(error => {
-        console.error("Lỗi:", error);
-    });
-}
+    .catch(error => console.error("Lỗi:", error));
+};
 
-// Remove from Cart
-function removeCart(productid) {
+// Remove from Cart (Cart Page)
+window.removeCart = function(productid) {
     if (!confirm("Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?")) return;
     
     const formData = new FormData();
@@ -121,25 +143,5 @@ function removeCart(productid) {
             alert(data.message);
         }
     })
-    .catch(error => {
-        console.error("Lỗi:", error);
-    });
-}
-
-// Detail Page Quantity Buttons
-document.addEventListener("DOMContentLoaded", function() {
-    const btnPlus = document.getElementById('btn-plus');
-    const btnMinus = document.getElementById('btn-minus');
-    const qtyInput = document.getElementById('quantity');
-    
-    if (btnPlus && btnMinus && qtyInput) {
-        btnPlus.addEventListener('click', function() {
-            qtyInput.value = parseInt(qtyInput.value) + 1;
-        });
-        btnMinus.addEventListener('click', function() {
-            if (parseInt(qtyInput.value) > 1) {
-                qtyInput.value = parseInt(qtyInput.value) - 1;
-            }
-        });
-    }
-});
+    .catch(error => console.error("Lỗi:", error));
+};
