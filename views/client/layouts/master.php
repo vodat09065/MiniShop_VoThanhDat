@@ -16,6 +16,5 @@
 <?php include __DIR__ . "/footer.php"; ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>const BASE_URL = "<?= BASE_URL ?>";</script>
-<script src="<?= BASE_URL ?>assets/client/cart.js?v=<?= time() ?>"></script>
 </body>
 </html>
