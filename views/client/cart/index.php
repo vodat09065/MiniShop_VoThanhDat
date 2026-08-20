@@ -35,16 +35,16 @@
                                     <td><span class="text-danger fw-medium"><?= number_format($item['price']) ?> ₫</span></td>
                                     <td>
                                         <div class="input-group input-group-sm" style="width: 100px;">
-                                            <a href="<?= BASE_URL ?>cart/update?productid=<?= $item['productid'] ?>&quantity=<?= $item['quantity'] - 1 ?>" class="btn btn-outline-secondary">-</a>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="updateCart(<?= $item['productid'] ?>, <?= $item['quantity'] - 1 ?>)">-</button>
                                             <input type="text" class="form-control text-center fw-bold" value="<?= $item['quantity'] ?>" readonly>
-                                            <a href="<?= BASE_URL ?>cart/update?productid=<?= $item['productid'] ?>&quantity=<?= $item['quantity'] + 1 ?>" class="btn btn-outline-secondary">+</a>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="updateCart(<?= $item['productid'] ?>, <?= $item['quantity'] + 1 ?>)">+</button>
                                         </div>
                                     </td>
                                     <td class="item-subtotal-<?= $item['productid'] ?> fw-bold"><?= number_format($item['price'] * $item['quantity']) ?> ₫</td>
                                     <td>
-                                        <a href="<?= BASE_URL ?>cart/remove?productid=<?= $item['productid'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCart(<?= $item['productid'] ?>)">
                                             <i class="bi bi-trash"></i>
-                                        </a>
+                                        </button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

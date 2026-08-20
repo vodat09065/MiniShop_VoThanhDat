@@ -40,15 +40,16 @@
                 </div>
             </div>
             
-            <form action="<?= BASE_URL ?>cart/add" method="POST" class="d-flex align-items-center gap-3 mt-4 pt-4 border-top">
-                <input type="hidden" name="productid" value="<?= $product->id ?>">
+            <div class="d-flex align-items-center gap-3 mt-4 pt-4 border-top">
                 <div class="input-group input-group-lg" style="width: 140px;">
-                    <input type="number" name="quantity" class="form-control text-center bg-white" value="1" min="1" id="quantity">
+                    <button class="btn btn-outline-secondary" type="button" id="btn-minus"><i class="bi bi-dash"></i></button>
+                    <input type="text" class="form-control text-center bg-white" value="1" id="quantity" readonly>
+                    <button class="btn btn-outline-secondary" type="button" id="btn-plus"><i class="bi bi-plus"></i></button>
                 </div>
-                <button type="submit" class="btn btn-primary btn-lg px-4 flex-grow-1">
+                <button class="btn btn-primary btn-lg px-4 flex-grow-1 btn-add-cart" data-productid="<?= $product->id ?>">
                     <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 </div>

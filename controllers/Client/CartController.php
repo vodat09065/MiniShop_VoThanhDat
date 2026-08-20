@@ -34,20 +34,20 @@ class CartController
             $_SESSION[CART_SESSION_KEY] = [];
         }
 
-        $productid = $_REQUEST["productid"] ?? null;
+        $productid = $_POST["productid"] ?? null;
         if (!$productid) {
-            header("Location: " . BASE_URL . "?error=invalid_product");
+            echo json_encode(["success" => false, "message" => "Sản phẩm không hợp lệ"]);
             exit;
         }
 
         $product = $this->productDAO->findById($productid);
         if (!$product) {
-            header("Location: " . BASE_URL . "?error=product_not_found");
+            echo json_encode(["success" => false, "message" => "Không tìm thấy sản phẩm"]);
             exit;
         }
 
         $price = $product->discountPrice > 0 ? $product->discountPrice : $product->price;
-        $quantity = isset($_REQUEST["quantity"]) ? (int)$_REQUEST["quantity"] : 1;
+        $quantity = isset($_POST["quantity"]) ? (int)$_POST["quantity"] : 1;
         if ($quantity < 1) $quantity = 1;
 
         if (isset($_SESSION[CART_SESSION_KEY][$productid])) {
@@ -62,8 +62,16 @@ class CartController
             ];
         }
 
-        // Redirect to Cart page
-        header("Location: " . BASE_URL . "cart");
+        $cartCount = 0;
+        foreach ($_SESSION[CART_SESSION_KEY] as $item) {
+            $cartCount += $item["quantity"];
+        }
+
+        echo json_encode([
+            "success" => true,
+            "message" => "Đã thêm sản phẩm vào giỏ hàng",
+            "cartCount" => $cartCount
+        ]);
         exit;
     }
 
@@ -89,27 +97,36 @@ class CartController
             $_SESSION[CART_SESSION_KEY] = [];
         }
 
-        $productid = $_REQUEST["productid"] ?? null;
-        $quantity = isset($_REQUEST["quantity"]) ? (int)$_REQUEST["quantity"] : null;
+        $productid = $_POST["productid"] ?? null;
+        $quantity = isset($_POST["quantity"]) ? (int)$_POST["quantity"] : null;
 
-        if (!$productid || $quantity === null) {
-            header("Location: " . BASE_URL . "cart?error=invalid_data");
-            exit;
-        }
-        
-        if ($quantity < 1) {
-            unset($_SESSION[CART_SESSION_KEY][$productid]);
-            header("Location: " . BASE_URL . "cart");
+        if (!$productid || $quantity === null || $quantity < 1) {
+            echo json_encode(["success" => false, "message" => "Dữ liệu không hợp lệ"]);
             exit;
         }
 
         if (isset($_SESSION[CART_SESSION_KEY][$productid])) {
             $_SESSION[CART_SESSION_KEY][$productid]["quantity"] = $quantity;
-            header("Location: " . BASE_URL . "cart");
+            
+            $cartCount = 0;
+            $cartTotal = 0;
+            $itemTotal = $_SESSION[CART_SESSION_KEY][$productid]["price"] * $quantity;
+            
+            foreach ($_SESSION[CART_SESSION_KEY] as $item) {
+                $cartCount += $item["quantity"];
+                $cartTotal += $item["price"] * $item["quantity"];
+            }
+
+            echo json_encode([
+                "success" => true,
+                "cartCount" => $cartCount,
+                "cartTotal" => number_format($cartTotal) . " ₫",
+                "itemTotal" => number_format($itemTotal) . " ₫"
+            ]);
             exit;
         }
 
-        header("Location: " . BASE_URL . "cart");
+        echo json_encode(["success" => false, "message" => "Sản phẩm không có trong giỏ hàng"]);
         exit;
     }
 
@@ -119,18 +136,33 @@ class CartController
             $_SESSION[CART_SESSION_KEY] = [];
         }
 
-        $productid = $_REQUEST["productid"] ?? null;
+        $productid = $_POST["productid"] ?? null;
 
         if (!$productid) {
-            header("Location: " . BASE_URL . "cart");
+            echo json_encode(["success" => false, "message" => "Dữ liệu không hợp lệ"]);
             exit;
         }
 
         if (isset($_SESSION[CART_SESSION_KEY][$productid])) {
             unset($_SESSION[CART_SESSION_KEY][$productid]);
+            
+            $cartCount = 0;
+            $cartTotal = 0;
+            foreach ($_SESSION[CART_SESSION_KEY] as $item) {
+                $cartCount += $item["quantity"];
+                $cartTotal += $item["price"] * $item["quantity"];
+            }
+
+            echo json_encode([
+                "success" => true,
+                "message" => "Đã xóa sản phẩm khỏi giỏ hàng",
+                "cartCount" => $cartCount,
+                "cartTotal" => number_format($cartTotal) . " ₫"
+            ]);
+            exit;
         }
 
-        header("Location: " . BASE_URL . "cart");
+        echo json_encode(["success" => false, "message" => "Sản phẩm không có trong giỏ hàng"]);
         exit;
     }
 
